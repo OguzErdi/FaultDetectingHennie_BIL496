@@ -77,7 +77,7 @@ int FiniteStateMachine::distinguishSequence(bool print) {
         for (auto it = currUncertainties.begin(); it != currUncertainties.end(); ) {
             for (int i = 0; i < stateNumber; ++i) {
                 tempOutSeq.emplace_back(currOutputSeq[i] + "" );
-                cout<< tempOutSeq[i]<<endl;
+                //cout<< tempOutSeq[i]<<endl;
             }
             cout<<endl;
 
@@ -103,27 +103,30 @@ int FiniteStateMachine::distinguishSequence(bool print) {
 }
 
 
-void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates, bool print, vector<string> outputSeqPreceding) {
+void FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates, bool print, vector<string> preceedingOutSeq) {
 
-    allUncertainties.push_back(tempInputStates);
+    allUncertainties.push_back(pInputStates);
 
-    cout<< "Input State= ";
-    if(print){
-        for (auto &val: tempInputStates){
-            for(auto &innerVal: val){
-                cout<< to_string(innerVal) + ", ";
+
+    if (print) {
+        cout<< "Input State= ";
+        for (int i = 0; i < stateNumber; ++i) {
+            cout << "(";
+            for (auto &val : pInputStates[i]) {
+                cout << val << ", ";
             }
+            cout << ")";
         }
+        cout << endl;
     }
-    cout << endl;
 
 
     //terminal sartları
 
     //2)homogenus compenenta sahip
     for (int i = 0; i < stateNumber; ++i) {
-        for(auto it = tempInputStates[i].begin(); it != tempInputStates[i].end(); it++) {
-            for (auto  itIn = it+1; itIn != tempInputStates[i].end() ; itIn++) {
+        for(auto it = pInputStates[i].begin(); it != pInputStates[i].end(); it++) {
+            for (auto  itIn = it+1; itIn != pInputStates[i].end() ; itIn++) {
                 if (itIn == it) {
                     cout << "it has homogenus component"<<endl;
                     return ;
@@ -134,7 +137,7 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
     //3)trivial components
     bool isTrivial=true;
     for (int i = 0; i < stateNumber; ++i) {
-        if(tempInputStates.size() != 1) {
+        if(pInputStates.size() != 1) {
             isTrivial = false;
             break;
         }
@@ -144,8 +147,8 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
 
     for(int input =0 ; input < 2 ; input++) {
 
-        int tempOutputState;
-        int tempOutput;
+        int outputState;
+        int output;
 
         string outputsFlags[stateNumber];
         for (int l = 0; l < stateNumber; ++l) {
@@ -160,26 +163,31 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
             uncertainty.push_back(component);
         }
 
+        //outputların, outputStateler ile aynı hizada olması icin aynı yapıda store edilmeli
+        //generate empty output sequences
+        vector<vector<string>> outputSeqs;
+        vector<string> compOutputSeq;
+        for (int i = 0; i < stateNumber; ++i) {
+            outputSeqs.push_back(compOutputSeq);
+        }
+
         int stringInput=0;
 
         for (int i = 0; i < stateNumber; ++i) {
-            for (int j = 0; j < (int) tempInputStates[i].size(); ++j) {
+            for (int j = 0; j < (int) pInputStates[i].size(); ++j) {
 
-                int inputState = tempInputStates[i][j];
-                tie(tempOutputState, tempOutput) = step(inputState, input, print);
+                int inputState = pInputStates[i][j];
+                tie(outputState, output) = step(inputState, input, false);
 
-                string temp = "";
-                temp.append(outputSeqPreceding[stringInput++ % stateNumber]);
-                temp.append(to_string(tempOutput));
-
-                currOutputSeq.push_back(temp);
-                cout << temp<<endl;
+                string resultOutSeq;
+                resultOutSeq.append(preceedingOutSeq[stringInput++ % stateNumber]);
+                resultOutSeq.append(to_string(output));
 
                 int emptyComponentNo = -1;
                 int sameComponentNo=0;
                 bool isSameComponent=false;
                 for (int l = 0; l < stateNumber; ++l) {
-                    if(outputsFlags[l].compare(temp) == 0) {
+                    if(outputsFlags[l] == resultOutSeq) {
                         isSameComponent = true;
                         sameComponentNo = l;
                     }
@@ -188,16 +196,26 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
                 }
 
                 if(isSameComponent) {
-                    uncertainty[sameComponentNo].push_back(tempOutputState);
+                    uncertainty[sameComponentNo].push_back(outputState);
+                    outputSeqs[sameComponentNo].push_back(resultOutSeq);
                 }
                 else{
-                    uncertainty[emptyComponentNo].push_back(tempOutputState);
-                    outputsFlags[emptyComponentNo]=temp;
+                    outputsFlags[emptyComponentNo]=resultOutSeq;
+                    uncertainty[emptyComponentNo].push_back(outputState);
+                    outputSeqs[emptyComponentNo].push_back(resultOutSeq);
                 }
             }
         }
         currUncertainties.push_back(uncertainty);
 
+        //outputlar tek diziye sokluyor tekrar
+        for (int i = 0; i < stateNumber; ++i) {
+            for (int j = 0; j < (int) outputSeqs[i].size(); ++j) {
+                currOutputSeq.push_back( outputSeqs[i][j]);
+            }
+        }
+
+        cout<< "(0) - Output State= ";
         if (print) {
             for (int i = 0; i < stateNumber; ++i) {
                 cout << "(";
