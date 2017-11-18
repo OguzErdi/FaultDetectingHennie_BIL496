@@ -36,7 +36,7 @@ tuple<int, int> FiniteStateMachine::step(int inpState, int input, bool print) {
         if (transIt->getInputState() == inpState) {
             if (transIt->getInput() == input) {
 
-                if (print == true) {
+                if (print) {
 
                     cout << "InputState\t| Input\t|OutputState\t| Output" << endl;
                     cout << "\t" << inpState
@@ -122,11 +122,12 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
 
     //2)homogenus compenenta sahip
     for (int i = 0; i < stateNumber; ++i) {
-        sort(tempInputStates[i].begin(), tempInputStates[i].end());
         for(auto it = tempInputStates[i].begin(); it != tempInputStates[i].end(); it++) {
-            if (tempInputStates[i] == tempInputStates[i + 1]) {
-                vector<vector<int>> temp;
-                return ;
+            for (auto  itIn = it+1; itIn != tempInputStates[i].end() ; itIn++) {
+                if (itIn == it) {
+                    cout << "it has homogenus component"<<endl;
+                    return ;
+                }
             }
         }
     }
@@ -145,63 +146,53 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> tempInputStates,
 
         int tempOutputState;
         int tempOutput;
-        int flagOutput;
 
         string outputsFlags[stateNumber];
         for (int l = 0; l < stateNumber; ++l) {
-            outputsFlags[l]=-1;
+            outputsFlags[l]="empty";
         }
 
-        vector<int> listOfEmptyComponent;
 
         //generate empty uncertainty vector
         vector<vector<int>> uncertainty;
         vector<int> component;
         for (int i = 0; i < stateNumber; ++i) {
             uncertainty.push_back(component);
-            listOfEmptyComponent.push_back(i);
         }
 
         int stringInput=0;
 
         for (int i = 0; i < stateNumber; ++i) {
-            //tersten dolaşarak, pop_back ile daha rahat eleman silecegim
-            for (int j = (int) tempInputStates[i].size() - 1; j >= 0; --j) {
+            for (int j = 0; j < (int) tempInputStates[i].size(); ++j) {
 
-                tie(tempOutputState, tempOutput) = step(tempInputStates[i][j], input, print);
-
+                int inputState = tempInputStates[i][j];
+                tie(tempOutputState, tempOutput) = step(inputState, input, print);
 
                 string temp = "";
                 temp.append(outputSeqPreceding[stringInput++ % stateNumber]);
                 temp.append(to_string(tempOutput));
 
                 currOutputSeq.push_back(temp);
+                cout << temp<<endl;
 
-                if (j == (int) tempInputStates[i].size() -1) {//listede oluşan ilk output, o listede hangi outputların saklanacağını belirler
-                    uncertainty[i].push_back(tempOutputState);
-                    outputsFlags[i]=temp;
-                    //boş component listesinden, bu componentı cıkart
-                    listOfEmptyComponent.erase(remove(listOfEmptyComponent.begin(), listOfEmptyComponent.end(), i), listOfEmptyComponent.end());
-                } else {
-                    int k=0;
-                    bool flag=false;
-                    for (k = 0; k < stateNumber; ++k) {
-                        if(outputsFlags[k].compare(temp) == 0) {
-                            flag = true;
-                            break;
-                        }
+                int emptyComponentNo = -1;
+                int sameComponentNo=0;
+                bool isSameComponent=false;
+                for (int l = 0; l < stateNumber; ++l) {
+                    if(outputsFlags[l].compare(temp) == 0) {
+                        isSameComponent = true;
+                        sameComponentNo = l;
                     }
-                    if(flag) {
-                        uncertainty[k].push_back(tempOutputState);
-                    }
-                    else{
-                        int emptyComp = listOfEmptyComponent.back();
-                        uncertainty[emptyComp].push_back(tempOutputState);
-                        outputsFlags[emptyComp]=temp;
-                        //boş component listesinden, bu componentı cıkart
-                        listOfEmptyComponent.erase(remove(listOfEmptyComponent.begin(), listOfEmptyComponent.end(), emptyComp), listOfEmptyComponent.end());
+                    else if(outputsFlags[l] == "empty" && emptyComponentNo == -1)
+                        emptyComponentNo = l;
+                }
 
-                    }
+                if(isSameComponent) {
+                    uncertainty[sameComponentNo].push_back(tempOutputState);
+                }
+                else{
+                    uncertainty[emptyComponentNo].push_back(tempOutputState);
+                    outputsFlags[emptyComponentNo]=temp;
                 }
             }
         }
