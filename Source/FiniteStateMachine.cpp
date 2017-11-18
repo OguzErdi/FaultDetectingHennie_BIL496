@@ -140,7 +140,7 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates, bo
     //3)trivial components
     bool isTrivial=true;
     for (int i = 0; i < stateNumber; ++i) {
-        if(pInputStates.size() != 1) {
+        if(pInputStates[i].size() != 1) {
             isTrivial = false;
             break;
         }
