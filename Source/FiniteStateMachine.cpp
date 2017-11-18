@@ -67,7 +67,6 @@ int FiniteStateMachine::distinguishSequence(bool print) {
         startInputStates.push_back(component);
     }
 
-    allUncertainties.push_back(startInputStates);
     currUncertainties.push_back(startInputStates);
 
     vector<string> tempOutSeq;
@@ -82,6 +81,13 @@ int FiniteStateMachine::distinguishSequence(bool print) {
             cout<<endl;
 
             produceUncertainty(*it, print, tempOutSeq);
+
+            if(print){
+                cout<<"-------------------------------------"<<endl;
+                cout<<"press any key to continue"<<endl;
+                getchar();
+            }
+
 
             //bu islem zaten iteratoru ilerletecek
             it = currUncertainties.erase(currUncertainties.begin());
@@ -104,9 +110,6 @@ int FiniteStateMachine::distinguishSequence(bool print) {
 
 
 void FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates, bool print, vector<string> preceedingOutSeq) {
-
-    allUncertainties.push_back(pInputStates);
-
 
     if (print) {
         cout<< "Input State= ";
@@ -215,7 +218,7 @@ void FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates, bo
             }
         }
 
-        cout<< "(0) - Output State= ";
+        cout<< "(" << input << ") - Output State= ";
         if (print) {
             for (int i = 0; i < stateNumber; ++i) {
                 cout << "(";

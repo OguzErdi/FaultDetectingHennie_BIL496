@@ -19,7 +19,7 @@ public:
     const vector<Transition> &getTrans() const;
     tuple<int, int> step(int inpState, int input, bool print);
     int distinguishSequence(bool print);
-    void produceUncertainty(vector<vector<int>> tempInputStates, bool print, vector<string> outputSeqPreceding);
+    void produceUncertainty(vector<vector<int>> pInputStates, bool print, vector<string> preceedingOutSeq);
 
 
 private:
@@ -27,7 +27,6 @@ private:
     int transitionNumber;
     vector<Transition> trans;
 
-    vector<vector<vector<int>>> allUncertainties;
     vector<vector<vector<int>>> currUncertainties;
     vector<string> currOutputSeq;
 
