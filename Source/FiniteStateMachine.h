@@ -17,9 +17,14 @@ class FiniteStateMachine {
 public:
     explicit FiniteStateMachine(list<int> inputs);
     const vector<Transition> &getTrans() const;
-    tuple<int, int> step(int inpState, int input, bool print);
+    tuple<int, int> step(int inpState,
+                         int input,
+                         bool print);
     int distinguishSequence(bool print);
-    int produceUncertainty(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq);
+    int produceUncertainty(vector<vector<int>> pInputStates,
+                           bool print,
+                           vector<string> precedingOutSeq,
+                           vector<string> precedingInpSeq);
 
 
 private:
@@ -30,5 +35,7 @@ private:
     vector<vector<vector<int>>> currUncertainties;
     vector<string> currOutputSeq;
     vector<string> currInputSeq;
+
+    string distSequence;
 
 };
