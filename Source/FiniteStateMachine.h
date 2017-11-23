@@ -29,7 +29,6 @@ public:
 
 private:
     int stateNumber;
-    int transitionNumber;
     vector<Transition> trans;
 
     vector<vector<vector<int>>> currUncertainties;
@@ -37,5 +36,12 @@ private:
     vector<string> currInputSeq;
 
     string distSequence;
+
+    class Distinguish{
+        vector<char> sequence;
+        vector<char> initialStates;
+        vector<char> outputStates;
+
+    };
 
 };

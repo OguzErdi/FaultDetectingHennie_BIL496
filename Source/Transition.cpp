@@ -6,11 +6,11 @@
 
 
 
-Transition::Transition(int _inputState, int _outputState, int _input, int _output) {
-    inputState = _inputState;
-    outputState = _outputState;
-    input = _input;
-    output = _output;
+Transition::Transition(int pInputState, int pOutputState, int pInput, int pOutput) {
+    inputState = pInputState;
+    outputState = pOutputState;
+    input = pInput;
+    output = pOutput;
 }
 
 

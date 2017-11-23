@@ -7,7 +7,7 @@ using namespace std;
 
 class Transition {
 public:
-    Transition(int _inputState, int _outputState, int _input, int _output);
+    Transition(int pInputState, int pOutputState, int pInput, int pOutput);
     friend ostream &operator<<( ostream &output, const Transition &transition );
     int getInputState() const;
     void setInputState(int inputState);

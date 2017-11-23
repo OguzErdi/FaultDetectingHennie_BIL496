@@ -216,7 +216,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
         }
 
         //terminal sartları
-        //2)homogeneous compnenta sahip
+        //2)homogeneous componenta sahip
         for (int i = 0; i < stateNumber; ++i) {
             for(auto it = uncertainty[i].begin(); it != uncertainty[i].end(); it++) {
                 for (auto  itIn = it+1; itIn != uncertainty[i].end() ; itIn++) {
