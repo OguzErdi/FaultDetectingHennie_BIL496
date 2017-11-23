@@ -21,14 +21,17 @@ public:
                          int input,
                          bool print);
     int distinguishSequence(bool print);
-    int produceUncertainty(vector<vector<int>> pInputStates,
-                           bool print,
-                           vector<string> precedingOutSeq,
-                           vector<string> precedingInpSeq);
 
 
 private:
     int stateNumber;
+    int produceUncertainty(vector<vector<int>> pInputStates,
+                           bool print,
+                           vector<string> precedingOutSeq,
+                           vector<string> precedingInpSeq);
+    void findInOutStates();
+
+private:
     vector<Transition> trans;
 
     vector<vector<vector<int>>> currUncertainties;
@@ -38,10 +41,11 @@ private:
     class Distinguish{
     public:
         string sequence;
+        vector<string> outputSequences;
         string initialStates;
         string outputStates;
-        string outputSequences;
         void print();
+
     };
 
     Distinguish distinguish;

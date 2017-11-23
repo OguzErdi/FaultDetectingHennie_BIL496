@@ -107,13 +107,19 @@ int FiniteStateMachine::distinguishSequence(bool print) {
         preOutSeq.clear();
         preInpSeq.clear();
     }
+
     cout<<"Outputs of Distinguish Sequence: ";
     for (auto it = currOutputSeq.end() - stateNumber; it != currOutputSeq.end(); ++it) {
+        //distinguish.outputSequences.push_back(*it);
         if(it == currOutputSeq.end() - stateNumber)
             cout << *it << endl;
         else
-            cout << "\t \t \t \t \t  " + *it << endl;
+            cout << "\t\t\t\t\t\t\t\t " + *it << endl;
     }
+
+    findInOutStates();
+    distinguish.print();
+
 
 
 }
@@ -264,7 +270,6 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
             cout << endl;
 
             distinguish.sequence.append(preInputs);
-            distinguish.print();
             return 1;
         }
 
@@ -274,6 +279,46 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 }
 
 
-void FiniteStateMachine::Distinguish::print() {
-    cout << "Distinguish Sequence: " << sequence<<endl;
+void FiniteStateMachine::findInOutStates() {
+
+    for (int inputState = 1; inputState <= stateNumber; ++inputState) {
+
+        int outputState;
+        int output;
+        string tempOutputSeq;
+        int tempInputState=inputState;
+        for (int distInp = 0; distInp < distinguish.sequence.size(); ++distInp) {
+
+            tie(outputState, output) = step(tempInputState, distinguish.sequence[distInp]- '0', false);
+            tempOutputSeq.append(to_string(output));
+            tempInputState = outputState;
+        }
+        distinguish.outputSequences.push_back(tempOutputSeq);
+        distinguish.initialStates.append(to_string(inputState));
+        distinguish.outputStates.append(to_string(outputState));
+
+    }
+
 }
+
+
+void FiniteStateMachine::Distinguish::print() {
+    cout << "Initial States:   " << initialStates<<endl;
+    cout <<"\t\t\t\t\t|\n\t\t\t\t\t|\n";
+    cout << "Distinguish Seq:   " << sequence<<endl;
+    cout <<"\t\t\t\t\t|\n\t\t\t\t\t|\n\t\t\t\t\tv\n";
+    cout << "Output States:    " << outputStates<<endl;
+    cout << "Output Seq:      --------\n";
+    for (int i = 0; i < sequence.size(); ++i) {
+
+        cout <<"\t\t\t\t  ";
+        for (int j = 0; j < outputSequences.size(); ++j) {
+            cout << outputSequences[j][i];
+
+        }
+        cout<<endl;
+    }
+
+
+}
+
