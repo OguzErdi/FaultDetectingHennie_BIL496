@@ -35,13 +35,14 @@ private:
     vector<string> currOutputSeq;
     vector<string> currInputSeq;
 
-    string distSequence;
-
     class Distinguish{
-        vector<char> sequence;
-        vector<char> initialStates;
-        vector<char> outputStates;
-
+    public:
+        string sequence;
+        string initialStates;
+        string outputStates;
+        string outputSequences;
+        void print();
     };
 
+    Distinguish distinguish;
 };

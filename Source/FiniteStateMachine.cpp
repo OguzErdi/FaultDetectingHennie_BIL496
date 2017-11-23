@@ -7,7 +7,6 @@ FiniteStateMachine::FiniteStateMachine(list<int> inputs) {
     it++;
     stateNumber = *it;
     it++;
-    transitionNumber = *it;
 
     for (; it != inputs.end(); it++) {
         int tempInpState = *it;
@@ -108,13 +107,14 @@ int FiniteStateMachine::distinguishSequence(bool print) {
         preOutSeq.clear();
         preInpSeq.clear();
     }
-    cout<<"Last output sequence: ";
+    cout<<"Outputs of Distinguish Sequence: ";
     for (auto it = currOutputSeq.end() - stateNumber; it != currOutputSeq.end(); ++it) {
         if(it == currOutputSeq.end() - stateNumber)
             cout << *it << endl;
         else
             cout << "\t \t \t \t \t  " + *it << endl;
     }
+
 
 }
 
@@ -262,8 +262,9 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
                 cout << ")";
             }
             cout << endl;
-            distSequence.append(preInputs);
-            cout << "Distinguish Sequence: " << distSequence<<endl;
+
+            distinguish.sequence.append(preInputs);
+            distinguish.print();
             return 1;
         }
 
@@ -273,3 +274,6 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 }
 
 
+void FiniteStateMachine::Distinguish::print() {
+    cout << "Distinguish Sequence: " << sequence<<endl;
+}
