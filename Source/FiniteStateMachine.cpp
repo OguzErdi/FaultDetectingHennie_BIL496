@@ -21,7 +21,7 @@ FiniteStateMachine::FiniteStateMachine(list<int> inputs) {
 
         trans.push_back(tempTrans);
     }
-    
+
 }
 
 const vector<Transition> &FiniteStateMachine::getTrans() const {
@@ -119,9 +119,6 @@ int FiniteStateMachine::distinguishSequence(bool print) {
 
     findInOutStates();
     distinguish.print();
-
-
-
 }
 
 
@@ -299,6 +296,10 @@ void FiniteStateMachine::findInOutStates() {
 
     }
 
+}
+
+int FiniteStateMachine::checkingSequence(bool print) {
+    return 0;
 }
 
 

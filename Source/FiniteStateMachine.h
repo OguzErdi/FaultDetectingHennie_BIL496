@@ -21,6 +21,7 @@ public:
                          int input,
                          bool print);
     int distinguishSequence(bool print);
+    int checkingSequence(bool print);
 
 
 private:

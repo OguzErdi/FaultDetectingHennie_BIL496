@@ -59,7 +59,6 @@ bool FsmHelper::GetOneFsm()
         inputs.push_back(tempInt);
     }
 
-
     return true;
 
 }
@@ -67,7 +66,6 @@ bool FsmHelper::GetOneFsm()
 vector <FiniteStateMachine> FsmHelper::GetAllFsms() {
 
     FsmHelper fsm;
-
 
     while(GetOneFsm()) {
         FiniteStateMachine tempFSM(inputs);

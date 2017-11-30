@@ -11,14 +11,14 @@ using namespace std;
 
 class FsmHelper
 {
-	public:
-		bool static GetOneFsm();
-        vector<FiniteStateMachine> static GetAllFsms();
+public:
+	bool static GetOneFsm();
+	vector<FiniteStateMachine> static GetAllFsms();
 
 
 private:
-    FsmHelper();
-    explicit FsmHelper(string file);
+	FsmHelper();
+	explicit FsmHelper(string file);
 };
 static vector<FiniteStateMachine> fsmList;
 static list<int> inputs;
