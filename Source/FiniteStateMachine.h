@@ -20,7 +20,7 @@ public:
     tuple<int, int> step(int inpState,
                          int input,
                          bool print);
-    int distinguishSequence(bool print);
+    void distinguishSequence(bool print);
     int checkingSequence(bool print);
 
 

@@ -51,7 +51,7 @@ tuple<int, int> FiniteStateMachine::step(int inpState, int input, bool print) {
     }
     return make_tuple(-1, -1);
 }
-int FiniteStateMachine::distinguishSequence(bool print) {
+void FiniteStateMachine::distinguishSequence(bool print) {
 
     vector<vector<int>> startInputStates;
 
@@ -299,6 +299,8 @@ void FiniteStateMachine::findInOutStates() {
 }
 
 int FiniteStateMachine::checkingSequence(bool print) {
+
+
     return 0;
 }
 
