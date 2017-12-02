@@ -20,34 +20,45 @@ public:
     tuple<int, int> step(int inpState,
                          int input,
                          bool print);
-    void distinguishSequence(bool print);
-    int checkingSequence(bool print);
+    void generateDistinguishSequence(bool print);
+    int generateCheckingSequence(bool print);
 
 
 private:
-    int stateNumber;
-    int produceUncertainty(vector<vector<int>> pInputStates,
-                           bool print,
-                           vector<string> precedingOutSeq,
-                           vector<string> precedingInpSeq);
-    void findInOutStates();
-
-private:
-    vector<Transition> trans;
-
-    vector<vector<vector<int>>> currUncertainties;
-    vector<string> currOutputSeq;
-    vector<string> currInputSeq;
-
     class Distinguish{
     public:
         string sequence;
         vector<string> outputSequences;
+        vector<string> outputStateSeq;
         string initialStates;
         string outputStates;
         void print();
 
     };
-
     Distinguish distinguish;
+    class Checking{
+    public:
+        vector<int> sequence;
+        vector<int> outputSequences;
+        vector<int> outputStateSeq; //always has more than one element than checking sequence. Like pattern in paper.
+        vector<bool> isCheckedState;
+        bool isAllChecked();
+        void print();
+
+    };
+
+    Checking checking;
+
+
+    int stateNumber;
+    vector<Transition> trans;
+    vector<vector<vector<int>>> currUncertainties;
+    vector<string> currOutputSeq;
+    vector<string> currInputSeq;
+
+    int produceUncertainty(vector<vector<int>> pInputStates,
+                           bool print,
+                           vector<string> precedingOutSeq,
+                           vector<string> precedingInpSeq);
+    void findInOutStates();
 };

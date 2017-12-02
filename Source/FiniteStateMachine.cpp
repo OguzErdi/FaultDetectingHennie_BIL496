@@ -1,4 +1,5 @@
 #include "FiniteStateMachine.h"
+
 FiniteStateMachine::FiniteStateMachine(list<int> inputs) {
 
     auto it = inputs.begin();//iterator for traverse inputs
@@ -51,7 +52,8 @@ tuple<int, int> FiniteStateMachine::step(int inpState, int input, bool print) {
     }
     return make_tuple(-1, -1);
 }
-void FiniteStateMachine::distinguishSequence(bool print) {
+
+void FiniteStateMachine::generateDistinguishSequence(bool print) {
 
     vector<vector<int>> startInputStates;
 
@@ -76,20 +78,20 @@ void FiniteStateMachine::distinguishSequence(bool print) {
 
     int hasDist;
 
-    for (auto it = currUncertainties.begin(); it != currUncertainties.end(); ) {
+    for (auto it = currUncertainties.begin(); it != currUncertainties.end();) {
         for (int i = 0; i < stateNumber; ++i) {
-            preOutSeq.emplace_back(currOutputSeq[i] + "" );
+            preOutSeq.emplace_back(currOutputSeq[i] + "");
         }
 
-        preInpSeq.emplace_back(currInputSeq[0] + "" );
+        preInpSeq.emplace_back(currInputSeq[0] + "");
 
 
         hasDist = produceUncertainty(*it, print, preOutSeq, preInpSeq);
 
-        if(hasDist)
+        if (hasDist)
             break;
 
-        if(print) {
+        if (print) {
             cout << "press any key to continue" << endl;
             getchar();
         }
@@ -108,10 +110,10 @@ void FiniteStateMachine::distinguishSequence(bool print) {
         preInpSeq.clear();
     }
 
-    cout<<"Outputs of Distinguish Sequence: ";
+    cout << "Outputs of Distinguish Sequence: ";
     for (auto it = currOutputSeq.end() - stateNumber; it != currOutputSeq.end(); ++it) {
         //distinguish.outputSequences.push_back(*it);
-        if(it == currOutputSeq.end() - stateNumber)
+        if (it == currOutputSeq.end() - stateNumber)
             cout << *it << endl;
         else
             cout << "\t\t\t\t\t\t\t\t " + *it << endl;
@@ -119,6 +121,7 @@ void FiniteStateMachine::distinguishSequence(bool print) {
 
     findInOutStates();
     distinguish.print();
+    generateCheckingSequence(false);
 }
 
 
@@ -128,7 +131,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
                                            vector<string> precedingInpSeq) {
 
     if (print) {
-        cout<< "Input State= ";
+        cout << "Input State= ";
         for (int i = 0; i < stateNumber; ++i) {
             cout << "(";
             for (auto &val : pInputStates[i]) {
@@ -140,12 +143,12 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
     }
 
 
-    for(int input = 0 ; input < 2 ; input++) {
+    for (int input = 0; input < 2; input++) {
 
 
         string outputsFlags[stateNumber];
         for (int l = 0; l < stateNumber; ++l) {
-            outputsFlags[l]="empty";
+            outputsFlags[l] = "empty";
         }
 
 
@@ -166,7 +169,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
         //generate empty input sequences
         string preInputs;
 
-        int stringInput=0;
+        int stringInput = 0;
 
         for (int i = 0; i < stateNumber; ++i) {
             for (int j = 0; j < (int) pInputStates[i].size(); ++j) {
@@ -182,23 +185,21 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 
 
                 int emptyComponentNo = -1;
-                int sameComponentNo=0;
-                bool isSameComponent=false;
+                int sameComponentNo = 0;
+                bool isSameComponent = false;
                 for (int l = 0; l < stateNumber; ++l) {
-                    if(outputsFlags[l] == resultOutSeq) {
+                    if (outputsFlags[l] == resultOutSeq) {
                         isSameComponent = true;
                         sameComponentNo = l;
-                    }
-                    else if(outputsFlags[l] == "empty" && emptyComponentNo == -1)
+                    } else if (outputsFlags[l] == "empty" && emptyComponentNo == -1)
                         emptyComponentNo = l;
                 }
 
-                if(isSameComponent) {
+                if (isSameComponent) {
                     uncertainty[sameComponentNo].push_back(outputState);
                     outputSeqs[sameComponentNo].push_back(resultOutSeq);
-                }
-                else{
-                    outputsFlags[emptyComponentNo]=resultOutSeq;
+                } else {
+                    outputsFlags[emptyComponentNo] = resultOutSeq;
                     uncertainty[emptyComponentNo].push_back(outputState);
                     outputSeqs[emptyComponentNo].push_back(resultOutSeq);
                 }
@@ -207,7 +208,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 
 
         if (print) {
-            cout<< "(" << input << ") - Output State= ";
+            cout << "(" << input << ") - Output State= ";
             for (int i = 0; i < stateNumber; ++i) {
                 cout << "(";
                 for (auto &val : uncertainty[i]) {
@@ -221,10 +222,10 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
         //terminal sartları
         //2)homogeneous componenta sahip
         for (int i = 0; i < stateNumber; ++i) {
-            for(auto it = uncertainty[i].begin(); it != uncertainty[i].end(); it++) {
-                for (auto  itIn = it+1; itIn != uncertainty[i].end() ; itIn++) {
+            for (auto it = uncertainty[i].begin(); it != uncertainty[i].end(); it++) {
+                for (auto itIn = it + 1; itIn != uncertainty[i].end(); itIn++) {
                     if (itIn == it) {
-                        cout << "it has homogeneous component"<<endl;
+                        cout << "it has homogeneous component" << endl;
                         return 0;
                     }
                 }
@@ -236,7 +237,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
         //outputlar tek diziye sokluyor tekrar
         for (int i = 0; i < stateNumber; ++i) {
             for (int j = 0; j < (int) outputSeqs[i].size(); ++j) {
-                currOutputSeq.push_back( outputSeqs[i][j]);
+                currOutputSeq.push_back(outputSeqs[i][j]);
 
             }
         }
@@ -247,16 +248,16 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 
 
         //3)trivial components
-        bool isTrivial=true;
+        bool isTrivial = true;
         for (int i = 0; i < stateNumber; ++i) {
-            if(uncertainty[i].size() != 1) {
+            if (uncertainty[i].size() != 1) {
                 isTrivial = false;
                 break;
             }
         }
-        if(isTrivial){
-            cout << "it has trivial component. We have found Distinguish Sequence!"<<endl;
-            cout<< "Uncertainty= ";
+        if (isTrivial) {
+            cout << "it has trivial component. We have found Distinguish Sequence!" << endl;
+            cout << "Uncertainty= ";
             for (int i = 0; i < stateNumber; ++i) {
                 cout << "(";
                 for (auto &val : uncertainty[i]) {
@@ -272,7 +273,7 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
 
     }
 
-    return  0;
+    return 0;
 }
 
 
@@ -280,17 +281,20 @@ void FiniteStateMachine::findInOutStates() {
 
     for (int inputState = 1; inputState <= stateNumber; ++inputState) {
 
-        int outputState;
+        int outputState = -1;
         int output;
         string tempOutputSeq;
-        int tempInputState=inputState;
+        string tempOutputStateSeq;
+        int tempInputState = inputState;
         for (int distInp = 0; distInp < distinguish.sequence.size(); ++distInp) {
 
-            tie(outputState, output) = step(tempInputState, distinguish.sequence[distInp]- '0', false);
+            tie(outputState, output) = step(tempInputState, distinguish.sequence[distInp] - '0', false);
             tempOutputSeq.append(to_string(output));
+            tempOutputStateSeq.append(to_string(outputState));
             tempInputState = outputState;
         }
         distinguish.outputSequences.push_back(tempOutputSeq);
+        distinguish.outputStateSeq.push_back(tempOutputStateSeq);
         distinguish.initialStates.append(to_string(inputState));
         distinguish.outputStates.append(to_string(outputState));
 
@@ -298,30 +302,107 @@ void FiniteStateMachine::findInOutStates() {
 
 }
 
-int FiniteStateMachine::checkingSequence(bool print) {
+int FiniteStateMachine::generateCheckingSequence(bool print) {
 
+    //initialize checked state list
+    for (int l = 0; l < stateNumber; ++l) {
+        checking.isCheckedState.push_back(false);
+    }
+    //first put distinguish sequence for each state, start from 1(A) state
+    while (!checking.isAllChecked()) {
+
+        //add for state A
+        checking.outputStateSeq.push_back(1);
+
+        //add dist seq, output states and outputs to check seq for state A
+        for (int i = 0; i < distinguish.sequence.size(); ++i) {
+            //add dist seq
+            checking.sequence.push_back(distinguish.sequence[i] - '0');
+
+        }
+        //add output states
+        for (int j = 0; j < distinguish.outputStateSeq[1].size(); ++j) {
+            //add output states
+            checking.outputStateSeq.push_back(distinguish.outputStateSeq[0][j] - '0');
+            //add outputs
+            checking.outputSequences.push_back(distinguish.outputSequences[0][j] - '0');
+        }
+
+
+
+    }
+
+    //add one more dist sequence to verify last output state
+    for (int i = 0; i < distinguish.sequence.size(); ++i) {
+        checking.sequence.push_back(distinguish.sequence[i] - '0');
+    }
+
+
+    vector<Transition> uncheckedTrans;
+    for (int j = 0; j < trans.size(); j++) {
+
+        bool isUnchecked = true;
+        for (int i = 0; i < distinguish.sequence.size(); i++) {
+
+            //inputState ve inputu kontrol et
+            if (trans[j].getInputState() == distinguish.initialStates[i] - '0' &&
+                trans[j].getInput() == distinguish.sequence[i] - '0') {
+                isUnchecked = false;
+                break;
+            }
+        }
+        if (isUnchecked)
+            uncheckedTrans.push_back(trans[j]);
+
+    }
+
+    for (int i = 0; i < uncheckedTrans.size(); i++) {
+        cout << uncheckedTrans[i] << endl;
+    }
 
     return 0;
 }
 
 
 void FiniteStateMachine::Distinguish::print() {
-    cout << "Initial States:   " << initialStates<<endl;
-    cout <<"\t\t\t\t\t|\n\t\t\t\t\t|\n";
-    cout << "Distinguish Seq:   " << sequence<<endl;
-    cout <<"\t\t\t\t\t|\n\t\t\t\t\t|\n\t\t\t\t\tv\n";
-    cout << "Output States:    " << outputStates<<endl;
+    cout << "Initial States:   " << initialStates << endl;
+    cout << "\t\t\t\t\t|\n\t\t\t\t\t|\n";
+    cout << "Distinguish Seq:   " << sequence << endl;
+    cout << "\t\t\t\t\t|\n\t\t\t\t\t|\n\t\t\t\t\tv\n";
+    cout << "Output States:    " << outputStates << endl;
     cout << "Output Seq:      --------\n";
     for (int i = 0; i < sequence.size(); ++i) {
 
-        cout <<"\t\t\t\t  ";
+        cout << "\t\t\t\t  ";
         for (int j = 0; j < outputSequences.size(); ++j) {
             cout << outputSequences[j][i];
 
         }
-        cout<<endl;
+        cout << endl;
+    }
+
+    cout << "Output State Seq: --------\n";
+    for (int i = 0; i < sequence.size(); ++i) {
+
+        cout << "\t\t\t\t  ";
+        for (int j = 0; j < outputStateSeq.size(); ++j) {
+            cout << outputStateSeq[j][i];
+
+        }
+        cout << endl;
     }
 
 
 }
 
+void FiniteStateMachine::Checking::print() {
+
+}
+
+bool FiniteStateMachine::Checking::isAllChecked() {
+    bool temp = true;
+    for (int i = 0; i < isCheckedState.size(); ++i) {
+        temp = temp && isCheckedState[i];
+    }
+    return temp;
+}
