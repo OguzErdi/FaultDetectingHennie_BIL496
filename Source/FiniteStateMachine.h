@@ -21,7 +21,7 @@ public:
                          int input,
                          bool print);
     void generateDistinguishSequence(bool print);
-    int generateCheckingSequence(bool print);
+    int generateCheckingSequence();
 
 
 private:
@@ -61,4 +61,5 @@ private:
                            vector<string> precedingOutSeq,
                            vector<string> precedingInpSeq);
     void findInOutStates();
+    int findUncheckedState(int lastState, vector<int>& inputs);
 };
