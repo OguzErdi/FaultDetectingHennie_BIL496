@@ -310,9 +310,28 @@ int FiniteStateMachine::generateCheckingSequence() {
     }
     //first put distinguish sequence for each state, start from 1(A) state
     //start from state A
-    int lastState=1;
+    int lastState = 1;
+    checking.outputStateSeq.push_back(lastState);
     while (!checking.isAllChecked()) {
-        checking.outputStateSeq.push_back(lastState);
+
+        //if dist sequence already have added to check sequence for that state,
+        //take the state to another unchecked state
+        if (checking.isCheckedState[lastState - 1]) {
+            vector<int> toUncheckStateInputs;
+
+            findUncheckedState(lastState, toUncheckStateInputs);
+
+            for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
+                checking.sequence.push_back(toUncheckStateInputs[k]);
+                int outputState;
+                int output;
+                tie(outputState, output) = step(lastState, toUncheckStateInputs[k], false);
+                checking.outputStateSeq.push_back(outputState);
+                checking.outputSequences.push_back(output);
+            }
+            //take next state
+            lastState = checking.outputStateSeq.back();
+        }
 
         //add dist seq, output states and outputs to check seq for state A
         for (int i = 0; i < distinguish.sequence.size(); ++i) {
@@ -323,9 +342,9 @@ int FiniteStateMachine::generateCheckingSequence() {
         //add output states
         for (int j = 0; j < distinguish.outputStateSeq[1].size(); ++j) {
             //add output states
-            checking.outputStateSeq.push_back(distinguish.outputStateSeq[lastState-1][j] - '0');
+            checking.outputStateSeq.push_back(distinguish.outputStateSeq[lastState - 1][j] - '0');
             //add outputs
-            checking.outputSequences.push_back(distinguish.outputSequences[lastState-1][j] - '0');
+            checking.outputSequences.push_back(distinguish.outputSequences[lastState - 1][j] - '0');
         }
 
         //mark the current state
@@ -334,17 +353,9 @@ int FiniteStateMachine::generateCheckingSequence() {
         //take next state
         lastState = checking.outputStateSeq.back();
 
-        //if dist sequence already have added to check sequence for that state,
-        //take the state to another unchecked state
-        vector<int> toUncheckStateInputs;
-        if(checking.isCheckedState[lastState-1]){
-            findUncheckedState(lastState, toUncheckStateInputs);
-        }
-        for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
-            cout<< toUncheckStateInputs[k]<<endl;
-        }
-
     }
+
+    checking.print();
 
     //add one more dist sequence to verify last output state
     for (int i = 0; i < distinguish.sequence.size(); ++i) {
@@ -377,28 +388,27 @@ int FiniteStateMachine::generateCheckingSequence() {
     return 0;
 }
 
-int FiniteStateMachine::findUncheckedState(int lastState, vector<int>& inputs) {
+int FiniteStateMachine::findUncheckedState(int lastState, vector<int> &inputs) {
     vector<int> tempOutputs;
     vector<int> tempOutputStates;
-    while(checking.isCheckedState[lastState-1]){
-        int outputState;
-        int output;
-        for (int input = 0; input < 2; input++) {
-            tie(outputState, output) = step(lastState, input, false);
-            tempOutputs.push_back(output);
-            tempOutputStates.push_back(outputState);
-            if(!checking.isCheckedState[outputState-1]) {
-                inputs.push_back(input);
-                return true;
-            }
-        }
-        for (int i = 0; i < tempOutputStates.size(); ++i) {
-            inputs.push_back(tempOutputs[i]);
-            if(!findUncheckedState(tempOutputStates[i], inputs))
-                inputs.pop_back();
-        }
 
+    int outputState;
+    int output;
+    for (int input = 0; input < 2; input++) {
+        tie(outputState, output) = step(lastState, input, false);
+        tempOutputs.push_back(output);
+        tempOutputStates.push_back(outputState);
+        if (!checking.isCheckedState[outputState - 1]) {
+            inputs.push_back(input);
+            return true;
+        }
     }
+    for (int i = 0; i < tempOutputStates.size(); ++i) {
+        inputs.push_back(tempOutputs[i]);
+        if (!findUncheckedState(tempOutputStates[i], inputs))
+            inputs.pop_back();
+    }
+
     return 0;
 }
 
@@ -435,6 +445,23 @@ void FiniteStateMachine::Distinguish::print() {
 }
 
 void FiniteStateMachine::Checking::print() {
+
+    cout<<" ";
+    for (int i = 0; i < sequence.size(); ++i) {
+        cout<<sequence[i] << " ";
+    }
+    cout<<endl;
+    for (int i = 0; i < outputStateSeq.size(); ++i) {
+        cout<<outputStateSeq[i] << " ";
+    }
+    cout<<endl;
+    cout<<" ";
+    for (int i = 0; i < outputSequences.size(); ++i) {
+        cout<<outputSequences[i] << " ";
+    }
+    cout<<endl;
+
+
 
 }
 

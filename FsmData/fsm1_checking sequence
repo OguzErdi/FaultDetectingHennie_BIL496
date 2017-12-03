@@ -1,0 +1,13 @@
+you can think states as numeric variables
+
+        1 0 1 | 1 0 1 | 1 0 1 | 1 | 1 0 1
+       a d c  c  c b  b  b d  a   d   a c c
+        0 0 1 | 1 0 1 | 1 0 0 | 0 | 0 1 1
+              |       |       |   |
+              v       |       |   |
+              add dist|       v   |
+              checked |       find another unchecked state
+              state   v           |
+                      add dist    |
+                      checked     v
+                      state       unchecked state founded: state d
