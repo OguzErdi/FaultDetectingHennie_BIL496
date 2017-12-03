@@ -44,6 +44,7 @@ private:
         vector<bool> isCheckedState;
         bool isAllChecked();
         void print();
+        void addDistToChecking(FiniteStateMachine fsm, int& lastState);
 
     };
 

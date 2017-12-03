@@ -332,35 +332,17 @@ int FiniteStateMachine::generateCheckingSequence() {
             //take next state
             lastState = checking.outputStateSeq.back();
         }
-
-        //add dist seq, output states and outputs to check seq for state A
-        for (int i = 0; i < distinguish.sequence.size(); ++i) {
-            //add dist seq
-            checking.sequence.push_back(distinguish.sequence[i] - '0');
-
-        }
-        //add output states
-        for (int j = 0; j < distinguish.outputStateSeq[1].size(); ++j) {
-            //add output states
-            checking.outputStateSeq.push_back(distinguish.outputStateSeq[lastState - 1][j] - '0');
-            //add outputs
-            checking.outputSequences.push_back(distinguish.outputSequences[lastState - 1][j] - '0');
-        }
-
-        //mark the current state
-        checking.isCheckedState[lastState - 1] = true;
-
-        //take next state
-        lastState = checking.outputStateSeq.back();
+        //add one dist to checking sequence
+        checking.addDistToChecking(*this, lastState);
 
     }
 
     checking.print();
 
     //add one more dist sequence to verify last output state
-    for (int i = 0; i < distinguish.sequence.size(); ++i) {
-        checking.sequence.push_back(distinguish.sequence[i] - '0');
-    }
+    checking.addDistToChecking(*this, lastState);
+
+    checking.print();
 
 
     vector<Transition> uncheckedTrans;
@@ -388,6 +370,7 @@ int FiniteStateMachine::generateCheckingSequence() {
     return 0;
 }
 
+
 int FiniteStateMachine::findUncheckedState(int lastState, vector<int> &inputs) {
     vector<int> tempOutputs;
     vector<int> tempOutputStates;
@@ -410,6 +393,30 @@ int FiniteStateMachine::findUncheckedState(int lastState, vector<int> &inputs) {
     }
 
     return 0;
+}
+
+void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int& lastState) {
+
+    //add dist seq, output states and outputs to check seq for state A
+    for (int i = 0; i < fsm.distinguish.sequence.size(); ++i) {
+        //add dist seq
+        sequence.push_back(fsm.distinguish.sequence[i] - '0');
+
+    }
+    //add output states
+    for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState-1].size(); ++j) {
+        //add output states
+        outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
+        //add outputs
+        outputSequences.push_back(fsm.distinguish.outputSequences[lastState - 1][j] - '0');
+    }
+
+    //mark the current state
+    isCheckedState[lastState - 1] = true;
+
+    //take next state
+    lastState = outputStateSeq.back();
+
 }
 
 
@@ -472,3 +479,4 @@ bool FiniteStateMachine::Checking::isAllChecked() {
     }
     return temp;
 }
+
