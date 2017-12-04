@@ -5,8 +5,8 @@ FiniteStateMachine::FiniteStateMachine(list<int> inputs) {
     auto it = inputs.begin();//iterator for traverse inputs
 
 
-    it++;
     stateNumber = *it;
+    it++;
     it++;
 
     for (; it != inputs.end(); it++) {
