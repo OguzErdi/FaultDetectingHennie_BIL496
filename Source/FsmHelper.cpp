@@ -50,7 +50,7 @@ bool FsmHelper::GetOneFsm()
     dataFsmFile >> tempInt;
     inputs.push_back(tempInt);
     dataFsmFile >> transNo;
-    inputs.push_back(tempInt);
+    inputs.push_back(transNo);
 
     int transValues = transNo * 4;
 
