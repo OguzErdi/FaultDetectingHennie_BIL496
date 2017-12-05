@@ -318,7 +318,7 @@ int FiniteStateMachine::generateCheckingSequence() {
         //take the state to another unchecked state
         if (checking.isCheckedState[lastState - 1]) {
 
-            takeToUncheckedState(lastState);
+            takeToUncheckedItem(lastState, "state");
 
         }
         //add one dist to checking sequence
@@ -333,28 +333,23 @@ int FiniteStateMachine::generateCheckingSequence() {
 
     checking.print();
 
+    //verify every state adding distinguish sequence in the end
 
-    vector<Transition> uncheckedTrans;
-    for (int j = 0; j < trans.size(); j++) {
 
-        bool isUnchecked = true;
-        for (int i = 0; i < checking.sequence.size(); i++) {
-
-            //inputState ve inputu kontrol et
-            if (trans[j].getInput() == checking.sequence[i] &&
-                trans[j].getInputState() == checking.outputStateSeq[i]) {
-                isUnchecked = false;
-                break;
-            }
-        }
-        if (isUnchecked)
-            uncheckedTrans.push_back(trans[j]);
-
+    for (int i = 0; i < trans.size(); ++i) {
+        checking.isCheckedTrans.push_back(false);
     }
 
-    for (int i = 0; i < uncheckedTrans.size(); i++) {
-        cout << uncheckedTrans[i] << endl;
+    while(!checking.isAllTransChecked()){
+        transVerify(lastState);
     }
+
+
+
+//    for (int i = 0; i < isCheckedTrans.size(); ++i) {
+//        checking
+//    }
+
 
     return 0;
 }
@@ -362,8 +357,8 @@ int FiniteStateMachine::generateCheckingSequence() {
 
 
 
-vector<int> FiniteStateMachine::findUncheckedState(vector<vector<int>>& inputs,
-                                                   vector<int>& tempOutputStates) {
+vector<int>
+FiniteStateMachine::findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item) {
 
     int outputState;
     int output;
@@ -377,15 +372,25 @@ vector<int> FiniteStateMachine::findUncheckedState(vector<vector<int>>& inputs,
         oneSideInputs.push_back(input);
         tempOutputStates.push_back(outputState);
         inputs.push_back(oneSideInputs);
-        if (!checking.isCheckedState[outputState - 1]) {
-            return oneSideInputs;
+
+        if(item == "state") {
+            if (!checking.isCheckedState[outputState - 1]) {
+                return oneSideInputs;
+            }
+        }
+        else if(item == "trans"){
+            for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
+                if(checking.isCheckedTrans[i] == false && trans[i].getInputState() == outputState){
+                    return oneSideInputs;
+                }
+            }
         }
     }
 
-    return findUncheckedState(inputs, tempOutputStates);
+    return findUncheckedItem(inputs, tempOutputStates, item);
 }
 
-void FiniteStateMachine::takeToUncheckedState(int &lastState) {
+void FiniteStateMachine::takeToUncheckedItem(int &lastState, string item) {
 
     vector<vector<int>> inputs;
     vector<int> temp;
@@ -395,7 +400,7 @@ void FiniteStateMachine::takeToUncheckedState(int &lastState) {
     vector<int> tempOutputs;
     tempOutputStates.push_back(lastState);
 
-    vector<int> toUncheckStateInputs = findUncheckedState(inputs, tempOutputStates);
+    vector<int> toUncheckStateInputs = findUncheckedItem(inputs, tempOutputStates, item);
 
     for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
         checking.sequence.push_back(toUncheckStateInputs[k]);
@@ -409,6 +414,78 @@ void FiniteStateMachine::takeToUncheckedState(int &lastState) {
 
 }
 
+void FiniteStateMachine::transVerify(int &lastState) {
+
+    int outputState;
+    int output;
+    int currentCheckTrans;
+    bool currFlag = false;
+    for (currentCheckTrans = 0; currentCheckTrans < trans.size(); ++currentCheckTrans) {
+        if(trans[currentCheckTrans].getInputState() == lastState && checking.isCheckedTrans[currentCheckTrans] == false) {
+            checking.isCheckedTrans[currentCheckTrans]=true;
+            currFlag = true;
+            break;
+        }
+    }
+    //find another unchecked trans
+    if(!currFlag) {
+        takeToUncheckedItem(lastState, "trans");
+        transVerify(lastState);
+    }
+    else {
+        checking.sequence.push_back(trans[currentCheckTrans].getInput());
+        tie(outputState, output) = step(lastState, trans[currentCheckTrans].getInput(), false);
+        checking.outputStateSeq.push_back(outputState);
+        checking.outputSequences.push_back(output);
+        lastState = outputState;
+    }
+    //add one dist to checking sequence
+    checking.addDistToChecking(*this, lastState);
+
+    checking.print();
+
+    //update sequences
+    for (int j = 0; j < checking.sequence.size(); ++j) {
+
+//        if(checking.sequence[j] == trans[currentCheckTrans].getInput() &&
+//           checking.outputStateSeq[j] == trans[currentCheckTrans].getInputState() &&
+//           checking.outputStateSeq[j+1] == 0) {
+//
+//            checking.outputStateSeq[j + 1] = outputState;
+//        }
+        //look checkedTrans and put in to the sequence again
+        if(checking.outputStateSeq[j] != 0 && checking.outputStateSeq[j+1] == 0){
+            for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
+
+                if(checking.isCheckedTrans[i] == true &&
+                        checking.sequence[j] == trans[i].getInput() &&
+                        checking.outputStateSeq[j] == trans[i].getInputState()){
+
+                    checking.outputStateSeq[j+1] = trans[i].getOutputState();
+                }
+            }
+        }
+    }
+    checking.print();
+
+    //update isCheckedTrans
+    for (int iSeq = 0; iSeq < checking.sequence.size(); ++iSeq) {
+        if(checking.outputStateSeq[iSeq] != 0 && checking.outputStateSeq[iSeq+1] != 0){
+
+            for (int jTrans = 0; jTrans < trans.size(); ++jTrans) {
+                if(trans[jTrans].getInputState() == checking.outputStateSeq[iSeq] &&
+                    trans[jTrans].getInput() == checking.sequence[iSeq] &&
+                    checking.isCheckedTrans[jTrans] == false) {
+                        checking.isCheckedTrans[jTrans]=true;
+                    break;
+                }
+            }
+        }
+    }
+
+}
+
+
 void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int &lastState) {
 
     //add dist seq, output states and outputs to check seq for state A
@@ -419,8 +496,11 @@ void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int
     }
     //add output states
     for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState - 1].size(); ++j) {
+        if(j == fsm.distinguish.outputStateSeq[lastState - 1].size() - 1) //not the end one
         //add output states
-        outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
+            outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
+        else
+            outputStateSeq.push_back(0);
         //add outputs
         outputSequences.push_back(fsm.distinguish.outputSequences[lastState - 1][j] - '0');
     }
@@ -432,7 +512,6 @@ void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int
     lastState = outputStateSeq.back();
 
 }
-
 
 void FiniteStateMachine::Distinguish::print() {
     cout << "Initial States:   " << initialStates << endl;
@@ -467,6 +546,7 @@ void FiniteStateMachine::Distinguish::print() {
 
 void FiniteStateMachine::Checking::print() {
 
+    cout<<"--------------------------------------"<<endl;
     cout << " ";
     for (int i = 0; i < sequence.size(); ++i) {
         cout << sequence[i] << " ";
@@ -481,6 +561,7 @@ void FiniteStateMachine::Checking::print() {
         cout << outputSequences[i] << " ";
     }
     cout << endl;
+    cout<<"--------------------------------------"<<endl;
 
 
 }
@@ -493,3 +574,15 @@ bool FiniteStateMachine::Checking::isAllChecked() {
     return temp;
 }
 
+bool FiniteStateMachine::Checking::isAllTransChecked() {
+    bool temp = true;
+    for (int i = 0; i < isCheckedTrans.size(); ++i) {
+        temp = temp && isCheckedTrans[i];
+    }
+    return temp;
+}
+void FiniteStateMachine::Checking::updateCheckedTrans(){
+
+
+
+}

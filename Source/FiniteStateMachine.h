@@ -42,9 +42,12 @@ private:
         vector<int> outputSequences;
         vector<int> outputStateSeq; //always has more than one element than checking sequence. Like pattern in paper.
         vector<bool> isCheckedState;
+        vector<bool> isCheckedTrans;
         bool isAllChecked();
+        bool isAllTransChecked();
         void print();
         void addDistToChecking(FiniteStateMachine fsm, int& lastState);
+        void updateCheckedTrans();
 
     };
 
@@ -62,7 +65,8 @@ private:
                            vector<string> precedingOutSeq,
                            vector<string> precedingInpSeq);
     void findInOutStates();
-    vector<int> findUncheckedState(vector<vector<int>>& inputs,
-                           vector<int>& tempOutputStates);
-    void takeToUncheckedState(int& lastState );
+    vector<int> findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item);
+    void takeToUncheckedItem(int &lastState, string item);
+    void transVerify(int& lastState);
+
 };
