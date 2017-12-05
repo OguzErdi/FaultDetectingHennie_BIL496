@@ -317,27 +317,9 @@ int FiniteStateMachine::generateCheckingSequence() {
         //if dist sequence already have added to check sequence for that state,
         //take the state to another unchecked state
         if (checking.isCheckedState[lastState - 1]) {
-            vector<vector<int>> inputs;
-            vector<int> temp;
-            inputs.push_back(temp);
 
-            vector<int> tempOutputStates;
-            vector<int> tempOutputs;
-            tempOutputStates.push_back(lastState);
+            takeToUncheckedState(lastState);
 
-            vector<int> toUncheckStateInputs = findUncheckedState(inputs, tempOutputStates);
-
-            for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
-                checking.sequence.push_back(toUncheckStateInputs[k]);
-                int outputState;
-                int output;
-                tie(outputState, output) = step(lastState, toUncheckStateInputs[k], false);
-                checking.outputStateSeq.push_back(outputState);
-                checking.outputSequences.push_back(output);
-                lastState = outputState;
-            }
-            //take next state
-            lastState = checking.outputStateSeq.back();
         }
         //add one dist to checking sequence
         checking.addDistToChecking(*this, lastState);
@@ -356,11 +338,11 @@ int FiniteStateMachine::generateCheckingSequence() {
     for (int j = 0; j < trans.size(); j++) {
 
         bool isUnchecked = true;
-        for (int i = 0; i < distinguish.sequence.size(); i++) {
+        for (int i = 0; i < checking.sequence.size(); i++) {
 
             //inputState ve inputu kontrol et
-            if (trans[j].getInputState() == distinguish.initialStates[i] - '0' &&
-                trans[j].getInput() == distinguish.sequence[i] - '0') {
+            if (trans[j].getInput() == checking.sequence[i] &&
+                trans[j].getInputState() == checking.outputStateSeq[i]) {
                 isUnchecked = false;
                 break;
             }
@@ -376,6 +358,8 @@ int FiniteStateMachine::generateCheckingSequence() {
 
     return 0;
 }
+
+
 
 
 vector<int> FiniteStateMachine::findUncheckedState(vector<vector<int>>& inputs,
@@ -399,6 +383,30 @@ vector<int> FiniteStateMachine::findUncheckedState(vector<vector<int>>& inputs,
     }
 
     return findUncheckedState(inputs, tempOutputStates);
+}
+
+void FiniteStateMachine::takeToUncheckedState(int &lastState) {
+
+    vector<vector<int>> inputs;
+    vector<int> temp;
+    inputs.push_back(temp);
+
+    vector<int> tempOutputStates;
+    vector<int> tempOutputs;
+    tempOutputStates.push_back(lastState);
+
+    vector<int> toUncheckStateInputs = findUncheckedState(inputs, tempOutputStates);
+
+    for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
+        checking.sequence.push_back(toUncheckStateInputs[k]);
+        int outputState;
+        int output;
+        tie(outputState, output) = step(lastState, toUncheckStateInputs[k], false);
+        checking.outputStateSeq.push_back(outputState);
+        checking.outputSequences.push_back(output);
+        lastState = outputState;
+    }
+
 }
 
 void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int &lastState) {

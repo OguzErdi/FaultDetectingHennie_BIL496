@@ -64,4 +64,5 @@ private:
     void findInOutStates();
     vector<int> findUncheckedState(vector<vector<int>>& inputs,
                            vector<int>& tempOutputStates);
+    void takeToUncheckedState(int& lastState );
 };
