@@ -62,5 +62,6 @@ private:
                            vector<string> precedingOutSeq,
                            vector<string> precedingInpSeq);
     void findInOutStates();
-    int findUncheckedState(int lastState, vector<int>& inputs);
+    vector<int> findUncheckedState(vector<vector<int>>& inputs,
+                           vector<int>& tempOutputStates);
 };

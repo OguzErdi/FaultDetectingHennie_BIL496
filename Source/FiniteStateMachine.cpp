@@ -317,9 +317,15 @@ int FiniteStateMachine::generateCheckingSequence() {
         //if dist sequence already have added to check sequence for that state,
         //take the state to another unchecked state
         if (checking.isCheckedState[lastState - 1]) {
-            vector<int> toUncheckStateInputs;
+            vector<vector<int>> inputs;
+            vector<int> temp;
+            inputs.push_back(temp);
 
-            findUncheckedState(lastState, toUncheckStateInputs);
+            vector<int> tempOutputStates;
+            vector<int> tempOutputs;
+            tempOutputStates.push_back(lastState);
+
+            vector<int> toUncheckStateInputs = findUncheckedState(inputs, tempOutputStates);
 
             for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
                 checking.sequence.push_back(toUncheckStateInputs[k]);
@@ -328,6 +334,7 @@ int FiniteStateMachine::generateCheckingSequence() {
                 tie(outputState, output) = step(lastState, toUncheckStateInputs[k], false);
                 checking.outputStateSeq.push_back(outputState);
                 checking.outputSequences.push_back(output);
+                lastState = outputState;
             }
             //take next state
             lastState = checking.outputStateSeq.back();
@@ -371,31 +378,30 @@ int FiniteStateMachine::generateCheckingSequence() {
 }
 
 
-int FiniteStateMachine::findUncheckedState(int lastState, vector<int> &inputs) {
-    vector<int> tempOutputs;
-    vector<int> tempOutputStates;
+vector<int> FiniteStateMachine::findUncheckedState(vector<vector<int>>& inputs,
+                                                   vector<int>& tempOutputStates) {
 
     int outputState;
     int output;
+    int tempInpState = tempOutputStates[0];
+    tempOutputStates.erase(tempOutputStates.begin());
+    vector<int> initialTempInp = inputs[0];
+    inputs.erase(inputs.begin());
     for (int input = 0; input < 2; input++) {
-        tie(outputState, output) = step(lastState, input, false);
-        tempOutputs.push_back(output);
+        vector<int> oneSideInputs = initialTempInp;
+        tie(outputState, output) = step(tempInpState, input, false);
+        oneSideInputs.push_back(input);
         tempOutputStates.push_back(outputState);
+        inputs.push_back(oneSideInputs);
         if (!checking.isCheckedState[outputState - 1]) {
-            inputs.push_back(input);
-            return true;
+            return oneSideInputs;
         }
     }
-    for (int i = 0; i < tempOutputStates.size(); ++i) {
-        inputs.push_back(tempOutputs[i]);
-        if (!findUncheckedState(tempOutputStates[i], inputs))
-            inputs.pop_back();
-    }
 
-    return 0;
+    return findUncheckedState(inputs, tempOutputStates);
 }
 
-void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int& lastState) {
+void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int &lastState) {
 
     //add dist seq, output states and outputs to check seq for state A
     for (int i = 0; i < fsm.distinguish.sequence.size(); ++i) {
@@ -404,7 +410,7 @@ void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int
 
     }
     //add output states
-    for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState-1].size(); ++j) {
+    for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState - 1].size(); ++j) {
         //add output states
         outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
         //add outputs
@@ -453,21 +459,20 @@ void FiniteStateMachine::Distinguish::print() {
 
 void FiniteStateMachine::Checking::print() {
 
-    cout<<" ";
+    cout << " ";
     for (int i = 0; i < sequence.size(); ++i) {
-        cout<<sequence[i] << " ";
+        cout << sequence[i] << " ";
     }
-    cout<<endl;
+    cout << endl;
     for (int i = 0; i < outputStateSeq.size(); ++i) {
-        cout<<outputStateSeq[i] << " ";
+        cout << outputStateSeq[i] << " ";
     }
-    cout<<endl;
-    cout<<" ";
+    cout << endl;
+    cout << " ";
     for (int i = 0; i < outputSequences.size(); ++i) {
-        cout<<outputSequences[i] << " ";
+        cout << outputSequences[i] << " ";
     }
-    cout<<endl;
-
+    cout << endl;
 
 
 }
