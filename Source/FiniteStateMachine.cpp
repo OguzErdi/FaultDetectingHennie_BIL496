@@ -340,7 +340,7 @@ int FiniteStateMachine::generateCheckingSequence() {
         checking.isCheckedTrans.push_back(false);
     }
 
-    while(!checking.isAllTransChecked()){
+    while (!checking.isAllTransChecked()) {
         transVerify(lastState);
     }
 
@@ -353,8 +353,6 @@ int FiniteStateMachine::generateCheckingSequence() {
 
     return 0;
 }
-
-
 
 
 vector<int>
@@ -373,14 +371,13 @@ FiniteStateMachine::findUncheckedItem(vector<vector<int>> &inputs, vector<int> &
         tempOutputStates.push_back(outputState);
         inputs.push_back(oneSideInputs);
 
-        if(item == "state") {
+        if (item == "state") {
             if (!checking.isCheckedState[outputState - 1]) {
                 return oneSideInputs;
             }
-        }
-        else if(item == "trans"){
+        } else if (item == "trans") {
             for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
-                if(checking.isCheckedTrans[i] == false && trans[i].getInputState() == outputState){
+                if (checking.isCheckedTrans[i] == false && trans[i].getInputState() == outputState) {
                     return oneSideInputs;
                 }
             }
@@ -421,24 +418,25 @@ void FiniteStateMachine::transVerify(int &lastState) {
     int currentCheckTrans;
     bool currFlag = false;
     for (currentCheckTrans = 0; currentCheckTrans < trans.size(); ++currentCheckTrans) {
-        if(trans[currentCheckTrans].getInputState() == lastState && checking.isCheckedTrans[currentCheckTrans] == false) {
-            checking.isCheckedTrans[currentCheckTrans]=true;
+        if (trans[currentCheckTrans].getInputState() == lastState &&
+            checking.isCheckedTrans[currentCheckTrans] == false) {
+            checking.isCheckedTrans[currentCheckTrans] = true;
             currFlag = true;
             break;
         }
     }
     //find another unchecked trans
-    if(!currFlag) {
+    if (!currFlag) {
         takeToUncheckedItem(lastState, "trans");
         transVerify(lastState);
-    }
-    else {
+    } else {
         checking.sequence.push_back(trans[currentCheckTrans].getInput());
         tie(outputState, output) = step(lastState, trans[currentCheckTrans].getInput(), false);
         checking.outputStateSeq.push_back(outputState);
         checking.outputSequences.push_back(output);
         lastState = outputState;
     }
+
     //add one dist to checking sequence
     checking.addDistToChecking(*this, lastState);
 
@@ -454,14 +452,14 @@ void FiniteStateMachine::transVerify(int &lastState) {
 //            checking.outputStateSeq[j + 1] = outputState;
 //        }
         //look checkedTrans and put in to the sequence again
-        if(checking.outputStateSeq[j] != 0 && checking.outputStateSeq[j+1] == 0){
+        if (checking.outputStateSeq[j] != 0 && checking.outputStateSeq[j + 1] == 0) {
             for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
 
-                if(checking.isCheckedTrans[i] == true &&
-                        checking.sequence[j] == trans[i].getInput() &&
-                        checking.outputStateSeq[j] == trans[i].getInputState()){
+                if (checking.isCheckedTrans[i] == true &&
+                    checking.sequence[j] == trans[i].getInput() &&
+                    checking.outputStateSeq[j] == trans[i].getInputState()) {
 
-                    checking.outputStateSeq[j+1] = trans[i].getOutputState();
+                    checking.outputStateSeq[j + 1] = trans[i].getOutputState();
                 }
             }
         }
@@ -470,18 +468,19 @@ void FiniteStateMachine::transVerify(int &lastState) {
 
     //update isCheckedTrans
     for (int iSeq = 0; iSeq < checking.sequence.size(); ++iSeq) {
-        if(checking.outputStateSeq[iSeq] != 0 && checking.outputStateSeq[iSeq+1] != 0){
+        if (checking.outputStateSeq[iSeq] != 0 && checking.outputStateSeq[iSeq + 1] != 0) {
 
             for (int jTrans = 0; jTrans < trans.size(); ++jTrans) {
-                if(trans[jTrans].getInputState() == checking.outputStateSeq[iSeq] &&
+                if (trans[jTrans].getInputState() == checking.outputStateSeq[iSeq] &&
                     trans[jTrans].getInput() == checking.sequence[iSeq] &&
                     checking.isCheckedTrans[jTrans] == false) {
-                        checking.isCheckedTrans[jTrans]=true;
+                    checking.isCheckedTrans[jTrans] = true;
                     break;
                 }
             }
         }
     }
+
 
 }
 
@@ -496,8 +495,8 @@ void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int
     }
     //add output states
     for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState - 1].size(); ++j) {
-        if(j == fsm.distinguish.outputStateSeq[lastState - 1].size() - 1) //not the end one
-        //add output states
+        if (j == fsm.distinguish.outputStateSeq[lastState - 1].size() - 1) //not the end one
+            //add output states
             outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
         else
             outputStateSeq.push_back(0);
@@ -546,14 +545,31 @@ void FiniteStateMachine::Distinguish::print() {
 
 void FiniteStateMachine::Checking::print() {
 
-    cout<<"--------------------------------------"<<endl;
+    cout << "--------------------------------------" << endl;
     cout << " ";
     for (int i = 0; i < sequence.size(); ++i) {
         cout << sequence[i] << " ";
     }
     cout << endl;
     for (int i = 0; i < outputStateSeq.size(); ++i) {
-        cout << outputStateSeq[i] << " ";
+        switch (outputStateSeq[i]) {
+            case 0:
+                cout << "  ";
+                break;
+            case 1:
+                cout << "A ";
+                break;
+            case 2:
+                cout << "B ";
+                break;
+            case 3:
+                cout << "C ";
+                break;
+            case 4:
+                cout << "D ";
+                break;
+        }
+//        cout << outputStateSeq[i] << " ";
     }
     cout << endl;
     cout << " ";
@@ -561,7 +577,7 @@ void FiniteStateMachine::Checking::print() {
         cout << outputSequences[i] << " ";
     }
     cout << endl;
-    cout<<"--------------------------------------"<<endl;
+    cout << "--------------------------------------" << endl;
 
 
 }
@@ -581,8 +597,8 @@ bool FiniteStateMachine::Checking::isAllTransChecked() {
     }
     return temp;
 }
-void FiniteStateMachine::Checking::updateCheckedTrans(){
 
+void FiniteStateMachine::Checking::updateCheckedTrans() {
 
 
 }
