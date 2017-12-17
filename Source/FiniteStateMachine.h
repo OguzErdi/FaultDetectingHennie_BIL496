@@ -67,6 +67,6 @@ private:
     void findInOutStates();
     vector<int> findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item);
     void takeToUncheckedItem(int &lastState, string item);
-    void transVerify(int& lastState);
+    int transVerify(int &lastState);
 
 };

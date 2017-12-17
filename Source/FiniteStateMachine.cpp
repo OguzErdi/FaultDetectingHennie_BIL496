@@ -411,7 +411,7 @@ void FiniteStateMachine::takeToUncheckedItem(int &lastState, string item) {
 
 }
 
-void FiniteStateMachine::transVerify(int &lastState) {
+int FiniteStateMachine::transVerify(int &lastState) {
 
     int outputState;
     int output;
@@ -428,7 +428,8 @@ void FiniteStateMachine::transVerify(int &lastState) {
     //find another unchecked trans
     if (!currFlag) {
         takeToUncheckedItem(lastState, "trans");
-        transVerify(lastState);
+//        transVerify(lastState);
+        return 0;
     } else {
         checking.sequence.push_back(trans[currentCheckTrans].getInput());
         tie(outputState, output) = step(lastState, trans[currentCheckTrans].getInput(), false);
