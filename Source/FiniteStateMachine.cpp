@@ -121,7 +121,7 @@ void FiniteStateMachine::generateDistinguishSequence(bool print) {
 
     findInOutStates();
     distinguish.print();
-    generateCheckingSequence();
+//    generateCheckingSequence();
 }
 
 
@@ -303,6 +303,10 @@ void FiniteStateMachine::findInOutStates() {
 }
 
 int FiniteStateMachine::generateCheckingSequence() {
+
+    //find distinguish sequence
+    generateDistinguishSequence(false);
+
 
     //initialize checked state list
     for (int l = 0; l < stateNumber; ++l) {
