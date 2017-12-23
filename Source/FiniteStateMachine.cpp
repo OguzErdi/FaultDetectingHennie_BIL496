@@ -602,8 +602,3 @@ bool FiniteStateMachine::Checking::isAllTransChecked() {
     }
     return temp;
 }
-
-void FiniteStateMachine::Checking::updateCheckedTrans() {
-
-
-}
