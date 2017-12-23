@@ -62,28 +62,28 @@ void FiniteStateMachine::generateDistinguishSequence(bool print) {
         if (inputState == 1) {
             for (int i = 1; i <= stateNumber; ++i) {
                 component.push_back(i);
-                currOutputSeq.emplace_back("");
+                distinguish.currOutputSeq.emplace_back("");
             }
         }
         startInputStates.push_back(component);
     }
 
 
-    currInputSeq.emplace_back("");
+    distinguish.currInputSeq.emplace_back("");
 
-    currUncertainties.push_back(startInputStates);
+    distinguish.currUncertainties.push_back(startInputStates);
 
     vector<string> preOutSeq;
     vector<string> preInpSeq;
 
     int hasDist;
 
-    for (auto it = currUncertainties.begin(); it != currUncertainties.end();) {
+    for (auto it = distinguish.currUncertainties.begin(); it != distinguish.currUncertainties.end();) {
         for (int i = 0; i < stateNumber; ++i) {
-            preOutSeq.emplace_back(currOutputSeq[i] + "");
+            preOutSeq.emplace_back(distinguish.currOutputSeq[i] + "");
         }
 
-        preInpSeq.emplace_back(currInputSeq[0] + "");
+        preInpSeq.emplace_back(distinguish.currInputSeq[0] + "");
 
 
         hasDist = produceUncertainty(*it, print, preOutSeq, preInpSeq);
@@ -97,13 +97,13 @@ void FiniteStateMachine::generateDistinguishSequence(bool print) {
         }
 
         //bu islem zaten iteratoru ilerletecek
-        it = currUncertainties.erase(currUncertainties.begin());
+        it = distinguish.currUncertainties.erase(distinguish.currUncertainties.begin());
 
         for (int i = 1; i <= stateNumber; ++i) {
-            currOutputSeq.erase(currOutputSeq.begin());
+            distinguish.currOutputSeq.erase(distinguish.currOutputSeq.begin());
         }
 
-        currInputSeq.erase(currInputSeq.begin());
+        distinguish.currInputSeq.erase(distinguish.currInputSeq.begin());
 
 
         preOutSeq.clear();
@@ -111,9 +111,9 @@ void FiniteStateMachine::generateDistinguishSequence(bool print) {
     }
 
     cout << "Outputs of Distinguish Sequence: ";
-    for (auto it = currOutputSeq.end() - stateNumber; it != currOutputSeq.end(); ++it) {
+    for (auto it = distinguish.currOutputSeq.end() - stateNumber; it != distinguish.currOutputSeq.end(); ++it) {
         //distinguish.outputSequences.push_back(*it);
-        if (it == currOutputSeq.end() - stateNumber)
+        if (it == distinguish.currOutputSeq.end() - stateNumber)
             cout << *it << endl;
         else
             cout << "\t\t\t\t\t\t\t\t " + *it << endl;
@@ -233,18 +233,18 @@ int FiniteStateMachine::produceUncertainty(vector<vector<int>> pInputStates,
         }
 
 
-        currUncertainties.push_back(uncertainty);
+        distinguish.currUncertainties.push_back(uncertainty);
         //outputlar tek diziye sokluyor tekrar
         for (int i = 0; i < stateNumber; ++i) {
             for (int j = 0; j < (int) outputSeqs[i].size(); ++j) {
-                currOutputSeq.push_back(outputSeqs[i][j]);
+                distinguish.currOutputSeq.push_back(outputSeqs[i][j]);
 
             }
         }
 
         preInputs.append(precedingInpSeq[0]);
         preInputs.append(to_string(input));
-        currInputSeq.push_back(preInputs);
+        distinguish.currInputSeq.push_back(preInputs);
 
 
         //3)trivial components
@@ -489,7 +489,6 @@ int FiniteStateMachine::transVerify(int &lastState) {
 
 }
 
-
 void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int &lastState) {
 
     //add dist seq, output states and outputs to check seq for state A
@@ -516,6 +515,7 @@ void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int
     lastState = outputStateSeq.back();
 
 }
+
 
 void FiniteStateMachine::Distinguish::print() {
     cout << "Initial States:   " << initialStates << endl;
@@ -601,4 +601,8 @@ bool FiniteStateMachine::Checking::isAllTransChecked() {
         temp = temp && isCheckedTrans[i];
     }
     return temp;
+}
+
+void FiniteStateMachine::generateCharacterizingSequences(bool print) {
+
 }

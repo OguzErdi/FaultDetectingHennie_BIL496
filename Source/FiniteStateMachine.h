@@ -22,6 +22,7 @@ public:
                          bool print);
     void generateDistinguishSequence(bool print);
     int generateCheckingSequence();
+    void generateCharacterizingSequences(bool print);
 
 
 private:
@@ -32,10 +33,14 @@ private:
         vector<string> outputStateSeq;
         string initialStates;
         string outputStates;
+        vector<vector<vector<int>>> currUncertainties;
+        vector<string> currOutputSeq;
+        vector<string> currInputSeq;
         void print();
 
     };
     Distinguish distinguish;
+
     class Checking{
     public:
         vector<int> sequence;
@@ -47,18 +52,24 @@ private:
         bool isAllTransChecked();
         void print();
         void addDistToChecking(FiniteStateMachine fsm, int& lastState);
-        void updateCheckedTrans();
 
     };
-
     Checking checking;
 
+    class Characterizing{
+    public:
+        string sequence;
+        vector<string> outputSequences;
+        vector<string> outputStateSeq;
+        string initialStates;
+        string outputStates;
+        void print();
+
+    };
+    Characterizing characterizing;
 
     int stateNumber;
     vector<Transition> trans;
-    vector<vector<vector<int>>> currUncertainties;
-    vector<string> currOutputSeq;
-    vector<string> currInputSeq;
 
     int produceUncertainty(vector<vector<int>> pInputStates,
                            bool print,

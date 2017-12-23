@@ -9,6 +9,6 @@ int main(int argc, char* argv[])
     vector<FiniteStateMachine> fsmList;
     fsmList = FsmHelper::GetAllFsms();
 
-    fsmList[3].generateCheckingSequence();
+    fsmList[4].generateCheckingSequence();
 
 }
