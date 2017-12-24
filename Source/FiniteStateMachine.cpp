@@ -615,8 +615,6 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
     vector<string> preOutSeq;
     vector<string> preInpSeq;
 
-    int hasDist;
-
     for (auto it = characterizing.currUncertainties.begin(); it != characterizing.currUncertainties.end();) {
         for (int i = 0; i < stateNumber; ++i)
             preOutSeq.emplace_back(characterizing.currOutputSeq[i] + "");
@@ -632,17 +630,25 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 
         //bu islem zaten iteratoru ilerletecek
         it = characterizing.currUncertainties.erase(characterizing.currUncertainties.begin());
-
-        for (int i = 1; i <= stateNumber; ++i)
+        for (int i = 1; i <= stateNumber; ++i) {
             characterizing.currOutputSeq.erase(characterizing.currOutputSeq.begin());
+        }
 
         characterizing.currInputSeq.erase(characterizing.currInputSeq.begin());
+
+        //stop condition, when input seq is n-1(n = stateNumber)
+        if(!characterizing.currInputSeq.empty()) {
+            auto inputSeqSize = (int) characterizing.currInputSeq.front().size();
+            if (inputSeqSize == stateNumber)
+                break;
+        }
+        characterizing.makeCharSeqCheckTable(stateNumber);
 
         preOutSeq.clear();
         preInpSeq.clear();
     }
 
-//    findInOutStatesChar();
+    characterizing.findCharacterizingSequences();
     characterizing.print();
 }
 
@@ -735,4 +741,33 @@ void FiniteStateMachine::findInOutStatesChar() {
 
 void FiniteStateMachine::Characterizing::print() {
 
+}
+
+void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber) {
+
+    //create table to check is there any char seq
+    allInputSeq.push_back(currInputSeq[0]);
+    vector<string> tempOutputSeq;
+    for (int i = 0; i < stateNumber; ++i) {
+        tempOutputSeq.push_back(currOutputSeq[i]);
+    }
+    allOutputSeqTable.push_back(tempOutputSeq);
+
+    //print table that checking char seq
+    cout << allInputSeq.back() << endl;
+    cout << "-------" << endl;
+    for (int j = 0; j < allOutputSeqTable.back().size(); ++j) {
+        cout << allOutputSeqTable.back()[j] << endl;
+    }
+
+    cout << endl;
+
+}
+
+void FiniteStateMachine::Characterizing::findCharacterizingSequences() {
+
+    for (int i = 0; i < allOutputSeqTable.size(); ++i) {
+
+    }
+    return 0;
 }

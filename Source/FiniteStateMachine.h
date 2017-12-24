@@ -67,9 +67,12 @@ private:
         vector<string> currOutputSeq;
         vector<string> currInputSeq;
         vector<string> allInputSeq;
-        vector<vector<string>> alloutputSeqTable;
+        vector<vector<string>> allOutputSeqTable;
 
         void print();
+        //stop when outputSeq size n-1
+        void makeCharSeqCheckTable(int stateNumber);
+        void findCharacterizingSequences();
 
     };
     Characterizing characterizing;
@@ -90,5 +93,6 @@ private:
     void takeToUncheckedItem(int &lastState, string item);
 
     int transVerify(int &lastState);
+
 
 };
