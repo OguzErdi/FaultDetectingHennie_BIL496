@@ -600,17 +600,11 @@ bool FiniteStateMachine::Checking::isAllTransChecked() {
 
 void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 
-    vector<vector<int>> startInputStates;
+    vector<int> startInputStates;
 
     for (int inputState = 1; inputState <= stateNumber; ++inputState) {
-        vector<int> component;
-        if (inputState == 1) {
-            for (int i = 1; i <= stateNumber; ++i) {
-                component.push_back(i);
-                characterizing.currOutputSeq.emplace_back("");
-            }
-        }
-        startInputStates.push_back(component);
+        startInputStates.push_back(inputState);
+        characterizing.currOutputSeq.emplace_back("");
     }
 
 
@@ -624,17 +618,12 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
     int hasDist;
 
     for (auto it = characterizing.currUncertainties.begin(); it != characterizing.currUncertainties.end();) {
-        for (int i = 0; i < stateNumber; ++i) {
+        for (int i = 0; i < stateNumber; ++i)
             preOutSeq.emplace_back(characterizing.currOutputSeq[i] + "");
-        }
 
         preInpSeq.emplace_back(characterizing.currInputSeq[0] + "");
 
-
-        hasDist = produceUncertaintyChar(*it, print, preOutSeq, preInpSeq);
-
-        if (hasDist)
-            break;
+        produceUncertaintyChar(*it, print, preOutSeq, preInpSeq);
 
         if (print) {
             cout << "press any key to continue" << endl;
@@ -644,24 +633,13 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
         //bu islem zaten iteratoru ilerletecek
         it = characterizing.currUncertainties.erase(characterizing.currUncertainties.begin());
 
-        for (int i = 1; i <= stateNumber; ++i) {
+        for (int i = 1; i <= stateNumber; ++i)
             characterizing.currOutputSeq.erase(characterizing.currOutputSeq.begin());
-        }
 
         characterizing.currInputSeq.erase(characterizing.currInputSeq.begin());
 
-
         preOutSeq.clear();
         preInpSeq.clear();
-    }
-
-    cout << "Outputs of Characterizing Sequence: ";
-    for (auto it = characterizing.currOutputSeq.end() - stateNumber; it != characterizing.currOutputSeq.end(); ++it) {
-        //distinguish.outputSequences.push_back(*it);
-        if (it == characterizing.currOutputSeq.end() - stateNumber)
-            cout << *it << endl;
-        else
-            cout << "\t\t\t\t\t\t\t\t " + *it << endl;
     }
 
 //    findInOutStatesChar();
@@ -669,151 +647,65 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 }
 
 int
-FiniteStateMachine::produceUncertaintyChar(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
+FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print, vector<string> precedingOutSeq,
                                            vector<string> precedingInpSeq) {
     if (print) {
         cout << "Input State= ";
-        for (int i = 0; i < stateNumber; ++i) {
-            cout << "(";
-            for (auto &val : pInputStates[i]) {
-                cout << val << ", ";
-            }
-            cout << ")";
+        cout << "(";
+        for (auto &val : pInputStates) {
+            cout << val << ", ";
         }
-        cout << endl;
+        cout << ")";
     }
+    cout << endl;
 
 
     for (int input = 0; input < 2; input++) {
-
-
-        string outputsFlags[stateNumber];
-        for (int l = 0; l < stateNumber; ++l) {
-            outputsFlags[l] = "empty";
-        }
-
-
-        //generate empty uncertainty vector
-        vector<vector<int>> uncertainty;
-        vector<int> component;
-        for (int i = 0; i < stateNumber; ++i) {
-            uncertainty.push_back(component);
-        }
+        vector<int> uncertainty;
 
         //outputların, outputStateler ile aynı hizada olması icin aynı yapıda store edilmeli
         //generate empty output sequences
-        vector<vector<string>> outputSeqs;
-        vector<string> compOutputSeq;
-        for (int i = 0; i < stateNumber; ++i) {
-            outputSeqs.push_back(compOutputSeq);
-        }
+        vector<string> outputSeqs;
         //generate empty input sequences
         string preInputs;
 
         int stringInput = 0;
 
-        for (int i = 0; i < stateNumber; ++i) {
-            for (int j = 0; j < (int) pInputStates[i].size(); ++j) {
+        for (int i = 0; i < pInputStates.size(); ++i) {
 
-                int output;
-                int outputState;
-                int inputState = pInputStates[i][j];
-                tie(outputState, output) = step(inputState, input, false);
+            int output;
+            int outputState;
+            int inputState = pInputStates[i];
+            tie(outputState, output) = step(inputState, input, false);
 
-                string resultOutSeq;
-                resultOutSeq.append(precedingOutSeq[stringInput++ % stateNumber]);
-                resultOutSeq.append(to_string(output));
+            string resultOutSeq;
+            resultOutSeq.append(precedingOutSeq[stringInput++ % stateNumber]);
+            resultOutSeq.append(to_string(output));
 
-
-                int emptyComponentNo = -1;
-                int sameComponentNo = 0;
-                bool isSameComponent = false;
-                for (int l = 0; l < stateNumber; ++l) {
-                    if (outputsFlags[l] == resultOutSeq) {
-                        isSameComponent = true;
-                        sameComponentNo = l;
-                    } else if (outputsFlags[l] == "empty" && emptyComponentNo == -1)
-                        emptyComponentNo = l;
-                }
-
-                if (isSameComponent) {
-                    uncertainty[sameComponentNo].push_back(outputState);
-                    outputSeqs[sameComponentNo].push_back(resultOutSeq);
-                } else {
-                    outputsFlags[emptyComponentNo] = resultOutSeq;
-                    uncertainty[emptyComponentNo].push_back(outputState);
-                    outputSeqs[emptyComponentNo].push_back(resultOutSeq);
-                }
-            }
+            uncertainty.push_back(outputState);
+            outputSeqs.push_back(resultOutSeq);
         }
 
 
         if (print) {
             cout << "(" << input << ") - Output State= ";
-            for (int i = 0; i < stateNumber; ++i) {
-                cout << "(";
-                for (auto &val : uncertainty[i]) {
-                    cout << val << ", ";
-                }
-                cout << ")";
+            cout << "(";
+            for (auto &val : uncertainty) {
+                cout << val << ", ";
             }
-            cout << endl;
+            cout << ")";
         }
-
-        //terminal sartları
-        //2)homogeneous componenta sahip
-        for (int i = 0; i < stateNumber; ++i) {
-            for (auto it = uncertainty[i].begin(); it != uncertainty[i].end(); it++) {
-                for (auto itIn = it + 1; itIn != uncertainty[i].end(); itIn++) {
-                    if (itIn == it) {
-                        cout << "it has homogeneous component" << endl;
-                        return 0;
-                    }
-                }
-            }
-        }
-
+        cout << endl;
 
         characterizing.currUncertainties.push_back(uncertainty);
         //outputlar tek diziye sokluyor tekrar
-        for (int i = 0; i < stateNumber; ++i) {
-            for (int j = 0; j < (int) outputSeqs[i].size(); ++j) {
-                characterizing.currOutputSeq.push_back(outputSeqs[i][j]);
-
-            }
-        }
+        for (int i = 0; i < stateNumber; ++i)
+            characterizing.currOutputSeq.push_back(outputSeqs[i]);
 
         preInputs.append(precedingInpSeq[0]);
         preInputs.append(to_string(input));
         characterizing.currInputSeq.push_back(preInputs);
-
-
-        //3)trivial components
-//        bool isTrivial = true;
-//        for (int i = 0; i < stateNumber; ++i) {
-//            if (uncertainty[i].size() != 1) {
-//                isTrivial = false;
-//                break;
-//            }
-//        }
-//        if (isTrivial) {
-//            cout << "it has trivial component. We have found Distinguish Sequence!" << endl;
-//            cout << "Uncertainty= ";
-//            for (int i = 0; i < stateNumber; ++i) {
-//                cout << "(";
-//                for (auto &val : uncertainty[i]) {
-//                    cout << val << ", ";
-//                }
-//                cout << ")";
-//            }
-//            cout << endl;
-//
-//            characterizing.sequence.append(preInputs);
-//            return 1;
-//        }
-
     }
-
     return 0;
 }
 

@@ -63,7 +63,7 @@ private:
         vector<string> outputStateSeq;
         string initialStates;
         string outputStates;
-        vector<vector<vector<int>>> currUncertainties;
+        vector<vector<int>> currUncertainties;
         vector<string> currOutputSeq;
         vector<string> currInputSeq;
         vector<string> allInputSeq;
@@ -80,7 +80,7 @@ private:
     int produceUncertaintyDist(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);
 
-    int produceUncertaintyChar(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
+    int produceUncertaintyChar(vector<int> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);
     void findInOutStatesDist();
     void findInOutStatesChar();
