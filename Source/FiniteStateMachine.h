@@ -58,11 +58,17 @@ private:
 
     class Characterizing{
     public:
-        string sequence;
+        vector<string> sequence;
         vector<string> outputSequences;
         vector<string> outputStateSeq;
         string initialStates;
         string outputStates;
+        vector<vector<vector<int>>> currUncertainties;
+        vector<string> currOutputSeq;
+        vector<string> currInputSeq;
+        vector<string> allInputSeq;
+        vector<vector<string>> alloutputSeqTable;
+
         void print();
 
     };
@@ -71,13 +77,18 @@ private:
     int stateNumber;
     vector<Transition> trans;
 
-    int produceUncertainty(vector<vector<int>> pInputStates,
-                           bool print,
-                           vector<string> precedingOutSeq,
-                           vector<string> precedingInpSeq);
-    void findInOutStates();
+    int produceUncertaintyDist(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
+                               vector<string> precedingInpSeq);
+
+    int produceUncertaintyChar(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
+                               vector<string> precedingInpSeq);
+    void findInOutStatesDist();
+    void findInOutStatesChar();
+
     vector<int> findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item);
+
     void takeToUncheckedItem(int &lastState, string item);
+
     int transVerify(int &lastState);
 
 };
