@@ -648,7 +648,7 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
         preInpSeq.clear();
     }
 
-    characterizing.findCharacterizingSequences();
+    characterizing.findCharacterizingSequences(stateNumber);
     characterizing.print();
 }
 
@@ -764,7 +764,45 @@ void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber) 
 
 }
 
-void FiniteStateMachine::Characterizing::findCharacterizingSequences() {
+void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNumber) {
+
+    vector<vector<int>> willSingleton;
+    vector<string> Wset;
+
+    vector<int> Bi;
+    for (int j = 1; j <= stateNumber; ++j) {
+        Bi.push_back(j);
+    }
+
+
+    int j=0;
+    do{
+        //try to reduce size to 1(refer to one unique state)for each element of willSingleton list
+        int indexProcComp = (int)(j++ % willSingleton.size());
+        vector<int> processing = willSingleton[indexProcComp];
+
+        //Compare first element and rest of the vector
+        for (int i = 1; i < processing.size(); ++i) {
+            //travers all input seq to find which is procudes different output
+            for (int indexInputSeq = 0; indexInputSeq < allInputSeq.size()-1; ++indexInputSeq) {
+                //[index of output seq produce by input seq][index of state]
+                string currentOutput= allOutputSeqTable[indexInputSeq][processing[0] - 1];
+                string comparedOutput= allOutputSeqTable[indexInputSeq][processing[i] - 1];
+                //we find the characterizing sequence
+                if(currentOutput != comparedOutput){
+                    //add to W set
+                    Wset.push_back(allInputSeq[indexInputSeq]);
+                    //and split the component by output result
+                    for (int k = 0; k < processing.size(); ++k) {
+                        //erase current component
+                        willSingleton.erase(willSingleton.)
+                    }
+                }
+
+            }
+        }
+
+    }while(willSingleton.size() == stateNumber);
 
     for (int i = 0; i < allOutputSeqTable.size(); ++i) {
 

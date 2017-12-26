@@ -72,7 +72,7 @@ private:
         void print();
         //stop when outputSeq size n-1
         void makeCharSeqCheckTable(int stateNumber);
-        void findCharacterizingSequences();
+        void findCharacterizingSequences(int stateNumber);
 
     };
     Characterizing characterizing;
