@@ -741,11 +741,6 @@ void FiniteStateMachine::findInOutStatesChar() {
 
 }
 
-void FiniteStateMachine::Characterizing::print() {
-
-
-}
-
 void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, bool print) {
 
     //create table to check is there any char seq

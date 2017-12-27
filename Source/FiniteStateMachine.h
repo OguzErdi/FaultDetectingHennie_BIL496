@@ -69,7 +69,6 @@ private:
         vector<string> allInputSeq;
         vector<vector<string>> allOutputSeqTable;
 
-        void print();
         void printOutputTable(int stateNumber);
         //stop when outputSeq size n-1
         void makeCharSeqCheckTable(int stateNumber, bool print);
