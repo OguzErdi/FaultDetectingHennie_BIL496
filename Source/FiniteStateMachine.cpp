@@ -642,13 +642,15 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
             if (inputSeqSize == stateNumber)
                 break;
         }
-        characterizing.makeCharSeqCheckTable(stateNumber);
+        characterizing.makeCharSeqCheckTable(stateNumber, print);
 
         preOutSeq.clear();
         preInpSeq.clear();
     }
 
-    characterizing.findCharacterizingSequences(stateNumber);
+    if(print)
+        characterizing.printOutputTable(stateNumber);
+    characterizing.findCharacterizingSequences(stateNumber, print);
     characterizing.print();
 }
 
@@ -741,9 +743,10 @@ void FiniteStateMachine::findInOutStatesChar() {
 
 void FiniteStateMachine::Characterizing::print() {
 
+
 }
 
-void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber) {
+void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, bool print) {
 
     //create table to check is there any char seq
     allInputSeq.push_back(currInputSeq[0]);
@@ -753,59 +756,104 @@ void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber) 
     }
     allOutputSeqTable.push_back(tempOutputSeq);
 
-    //print table that checking char seq
-    cout << allInputSeq.back() << endl;
-    cout << "-------" << endl;
-    for (int j = 0; j < allOutputSeqTable.back().size(); ++j) {
-        cout << allOutputSeqTable.back()[j] << endl;
+    if(print) {
+        //print table that checking char seq
+        cout << allInputSeq.back() << endl;
+        cout << "-------" << endl;
+        for (int j = 0; j < allOutputSeqTable.back().size(); ++j) {
+            cout << allOutputSeqTable.back()[j] << endl;
+        }
+        cout << endl;
     }
-
-    cout << endl;
-
 }
 
-void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNumber) {
+void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNumber, bool print) {
 
     vector<vector<int>> willSingleton;
-    vector<string> Wset;
+    bool isSplitted;
 
     vector<int> Bi;
     for (int j = 1; j <= stateNumber; ++j) {
         Bi.push_back(j);
     }
+    willSingleton.push_back(Bi);
 
-
-    int j=0;
-    do{
+    do {
         //try to reduce size to 1(refer to one unique state)for each element of willSingleton list
-        int indexProcComp = (int)(j++ % willSingleton.size());
-        vector<int> processing = willSingleton[indexProcComp];
+        vector<int> processing(willSingleton[0]);
+        willSingleton.erase(willSingleton.begin());
+        isSplitted = false;
 
-        //Compare first element and rest of the vector
-        for (int i = 1; i < processing.size(); ++i) {
-            //travers all input seq to find which is procudes different output
-            for (int indexInputSeq = 0; indexInputSeq < allInputSeq.size()-1; ++indexInputSeq) {
-                //[index of output seq produce by input seq][index of state]
-                string currentOutput= allOutputSeqTable[indexInputSeq][processing[0] - 1];
-                string comparedOutput= allOutputSeqTable[indexInputSeq][processing[i] - 1];
-                //we find the characterizing sequence
-                if(currentOutput != comparedOutput){
-                    //add to W set
-                    Wset.push_back(allInputSeq[indexInputSeq]);
-                    //and split the component by output result
-                    for (int k = 0; k < processing.size(); ++k) {
-                        //erase current component
-                        willSingleton.erase(willSingleton.)
+        //component have just one state, dont process this component
+        if (processing.size() != 1 && !isSplitted ) {
+            //Compare first element and rest of the vector
+            for (int indexInputSeq = 0; indexInputSeq < allInputSeq.size() && !isSplitted ; ++indexInputSeq) {
+                //travers all input seq to find which is procudes different output
+                for (int i = 1; i < processing.size() && !isSplitted; ++i) {
+                    //[index of output seq produce by input seq][index of state]
+                    string currentOutput = allOutputSeqTable[indexInputSeq][processing[0] - 1];
+                    string comparedOutput = allOutputSeqTable[indexInputSeq][processing[i] - 1];
+                    //we find the characterizing sequence
+                    if (currentOutput != comparedOutput) {
+                        //add to W set
+                        sequences.push_back(allInputSeq[indexInputSeq]);
+                        bool flagSp = false;
+                        //and split the component by output results
+                        vector<int> sameOutputComp;
+                        for (int k = 0; k < processing.size(); k++) {
+                            string currentOutputSp = allOutputSeqTable[indexInputSeq][processing[k] - 1];
+                            for (int l = 0; l < processing.size(); ++l) {
+                                string comparedOutputSp = allOutputSeqTable[indexInputSeq][processing[l] - 1];
+                                if (currentOutputSp == comparedOutputSp) {
+                                    sameOutputComp.push_back(processing[l]);
+                                    k++;
+                                    flagSp = true;
+                                }
+                            }
+                            if(flagSp)
+                                k--;
+                            flagSp = false;
+                            willSingleton.push_back(sameOutputComp);
+                            sameOutputComp.clear();
+                        }
+                        isSplitted = true;
+                        break;
                     }
                 }
-
             }
         }
 
-    }while(willSingleton.size() == stateNumber);
+    } while (willSingleton.size() != stateNumber);
 
-    for (int i = 0; i < allOutputSeqTable.size(); ++i) {
 
+    //delete all duplicates
+    sort( sequences.begin(), sequences.end() );
+    sequences.erase( unique( sequences.begin(), sequences.end() ), sequences.end() );
+
+    if(print) {
+        cout<< "Characterizing Sequences"<<endl;
+        for (int m = 0; m < sequences.size(); ++m) {
+            cout << sequences[m] << endl;
+        }
     }
-    return 0;
+
+}
+
+void FiniteStateMachine::Characterizing::printOutputTable(int stateNumber) {
+
+    cout<<"Output table"<<endl;
+    for (int i = 0; i < allInputSeq.size(); ++i) {
+        cout << allInputSeq[i] + "\t";
+    }
+    cout << "" << endl;
+    for (int i = 0; i < allInputSeq.size(); ++i) {
+        cout << "---";
+    }
+    cout << "" << endl;
+    for (int i = 0; i < stateNumber; ++i) {
+        for (int m = 0; m < allOutputSeqTable.size(); ++m) {
+            cout <<allOutputSeqTable[m][i]+"\t";
+        }
+        cout<<endl;
+    }
 }

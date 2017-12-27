@@ -58,7 +58,7 @@ private:
 
     class Characterizing{
     public:
-        vector<string> sequence;
+        vector<string> sequences;
         vector<string> outputSequences;
         vector<string> outputStateSeq;
         string initialStates;
@@ -70,9 +70,10 @@ private:
         vector<vector<string>> allOutputSeqTable;
 
         void print();
+        void printOutputTable(int stateNumber);
         //stop when outputSeq size n-1
-        void makeCharSeqCheckTable(int stateNumber);
-        void findCharacterizingSequences(int stateNumber);
+        void makeCharSeqCheckTable(int stateNumber, bool print);
+        void findCharacterizingSequences(int stateNumber, bool print);
 
     };
     Characterizing characterizing;
