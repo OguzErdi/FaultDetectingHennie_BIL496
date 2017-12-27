@@ -650,8 +650,8 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 
     if(print)
         characterizing.printOutputTable(stateNumber);
+
     characterizing.findCharacterizingSequences(stateNumber, print);
-    characterizing.print();
 }
 
 int
@@ -664,8 +664,8 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
             cout << val << ", ";
         }
         cout << ")";
+        cout << endl;
     }
-    cout << endl;
 
 
     for (int input = 0; input < 2; input++) {
@@ -702,8 +702,8 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
                 cout << val << ", ";
             }
             cout << ")";
+            cout << endl;
         }
-        cout << endl;
 
         characterizing.currUncertainties.push_back(uncertainty);
         //outputlar tek diziye sokluyor tekrar
@@ -775,10 +775,9 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
 
     do {
         //try to reduce size to 1(refer to one unique state)for each element of willSingleton list
+        isSplitted = false;
         vector<int> processing(willSingleton[0]);
         willSingleton.erase(willSingleton.begin());
-        isSplitted = false;
-
         //component have just one state, dont process this component
         if (processing.size() != 1 && !isSplitted ) {
             //Compare first element and rest of the vector
@@ -817,6 +816,8 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
                 }
             }
         }
+        if(!isSplitted)
+            willSingleton.push_back(processing);
 
     } while (willSingleton.size() != stateNumber);
 
