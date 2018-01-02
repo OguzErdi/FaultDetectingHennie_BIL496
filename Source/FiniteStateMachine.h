@@ -21,7 +21,8 @@ public:
                          int input,
                          bool print);
     void generateDistinguishSequence(bool print);
-    int generateCheckingSequence();
+    int generateCheckingSequenceDist();
+    int generateCheckingSequenceChar();
     void generateCharacterizingSequences(bool print);
 
 
@@ -44,11 +45,11 @@ private:
     };
     Distinguish distinguish;
 
-    class Checking{
+    class CheckingDist{
     public:
         vector<int> sequence;
         vector<int> outputSequences;
-        vector<int> outputStateSeq; //always has more than one element than checking sequence. Like pattern in paper.
+        vector<int> outputStateSeq; //always has more than one element than checkingDist sequence. Like pattern in paper.
         vector<bool> isCheckedState;
         vector<bool> isCheckedTrans;
         bool isAllChecked();
@@ -57,15 +58,12 @@ private:
         void addDistToChecking(FiniteStateMachine fsm, int& lastState);
 
     };
-    Checking checking;
+    CheckingDist checkingDist;
 
     class Characterizing{
     public:
         vector<string> sequences;
-        vector<string> outputSequences;
-        vector<string> outputStateSeq;
-        string initialStates;
-        string outputStates;
+        vector<vector<string>> outputSequences;
         vector<vector<int>> currUncertainties;
         vector<string> currOutputSeq;
         vector<string> currInputSeq;
@@ -73,7 +71,6 @@ private:
         //first element is unnecessary, use index + 1
         vector<vector<string>> allOutputStateSeq;
         vector<vector<string>> allOutputSeqTable;
-        vector<string> locatingSequences;
 
         void printOutputTable(int stateNumber);
         //stop when outputSeq size n-1
@@ -82,7 +79,12 @@ private:
     };
     Characterizing characterizing;
 
-    void produceLocatingSequences();
+    class CheckingChar{
+    public:
+        vector<string> sequences;
+        vector<string> outputSequences;
+    };
+    CheckingChar checkingChar;
 
     int produceUncertaintyDist(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);
@@ -90,7 +92,6 @@ private:
     int produceUncertaintyChar(vector<int> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);
     void findInOutStatesDist();
-    void findInOutStatesChar();
 
     vector<int> findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item);
 

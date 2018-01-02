@@ -273,7 +273,7 @@ int FiniteStateMachine::produceUncertaintyDist(vector<vector<int>> pInputStates,
     return 0;
 }
 
-int FiniteStateMachine::generateCheckingSequence() {
+int FiniteStateMachine::generateCheckingSequenceDist() {
 
     //find distinguish sequence
     generateDistinguishSequence(false);
@@ -281,48 +281,48 @@ int FiniteStateMachine::generateCheckingSequence() {
 
     //initialize checked state list
     for (int l = 0; l < stateNumber; ++l) {
-        checking.isCheckedState.push_back(false);
+        checkingDist.isCheckedState.push_back(false);
     }
     //first put distinguish sequence for each state, start from 1(A) state
     //start from state A
     int lastState = 1;
-    checking.outputStateSeq.push_back(lastState);
-    while (!checking.isAllChecked()) {
+    checkingDist.outputStateSeq.push_back(lastState);
+    while (!checkingDist.isAllChecked()) {
 
         //if dist sequence already have added to check sequence for that state,
         //take the state to another unchecked state
-        if (checking.isCheckedState[lastState - 1]) {
+        if (checkingDist.isCheckedState[lastState - 1]) {
 
             takeToUncheckedItem(lastState, "state");
 
         }
-        //add one dist to checking sequence
-        checking.addDistToChecking(*this, lastState);
+        //add one dist to checkingDist sequence
+        checkingDist.addDistToChecking(*this, lastState);
 
     }
 
-    checking.print();
+    checkingDist.print();
 
     //add one more dist sequence to verify last output state
-    checking.addDistToChecking(*this, lastState);
+    checkingDist.addDistToChecking(*this, lastState);
 
-    checking.print();
+    checkingDist.print();
 
     //verify every state adding distinguish sequence in the end
 
 
     for (int i = 0; i < trans.size(); ++i) {
-        checking.isCheckedTrans.push_back(false);
+        checkingDist.isCheckedTrans.push_back(false);
     }
 
-    while (!checking.isAllTransChecked()) {
+    while (!checkingDist.isAllTransChecked()) {
         transVerify(lastState);
     }
 
 
 
 //    for (int i = 0; i < isCheckedTrans.size(); ++i) {
-//        checking
+//        checkingDist
 //    }
 
 
@@ -371,12 +371,12 @@ vector<int> FiniteStateMachine::findUncheckedItem(vector<vector<int>> &inputs, v
         inputs.push_back(oneSideInputs);
 
         if (item == "state") {
-            if (!checking.isCheckedState[outputState - 1]) {
+            if (!checkingDist.isCheckedState[outputState - 1]) {
                 return oneSideInputs;
             }
         } else if (item == "trans") {
-            for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
-                if (checking.isCheckedTrans[i] == false && trans[i].getInputState() == outputState) {
+            for (int i = 0; i < checkingDist.isCheckedTrans.size(); ++i) {
+                if (checkingDist.isCheckedTrans[i] == false && trans[i].getInputState() == outputState) {
                     return oneSideInputs;
                 }
             }
@@ -399,12 +399,12 @@ void FiniteStateMachine::takeToUncheckedItem(int &lastState, string item) {
     vector<int> toUncheckStateInputs = findUncheckedItem(inputs, tempOutputStates, item);
 
     for (int k = 0; k < toUncheckStateInputs.size(); ++k) {
-        checking.sequence.push_back(toUncheckStateInputs[k]);
+        checkingDist.sequence.push_back(toUncheckStateInputs[k]);
         int outputState;
         int output;
         tie(outputState, output) = step(lastState, toUncheckStateInputs[k], false);
-        checking.outputStateSeq.push_back(outputState);
-        checking.outputSequences.push_back(output);
+        checkingDist.outputStateSeq.push_back(outputState);
+        checkingDist.outputSequences.push_back(output);
         lastState = outputState;
     }
 
@@ -418,8 +418,8 @@ int FiniteStateMachine::transVerify(int &lastState) {
     bool currFlag = false;
     for (currentCheckTrans = 0; currentCheckTrans < trans.size(); ++currentCheckTrans) {
         if (trans[currentCheckTrans].getInputState() == lastState &&
-            checking.isCheckedTrans[currentCheckTrans] == false) {
-            checking.isCheckedTrans[currentCheckTrans] = true;
+            checkingDist.isCheckedTrans[currentCheckTrans] == false) {
+            checkingDist.isCheckedTrans[currentCheckTrans] = true;
             currFlag = true;
             break;
         }
@@ -430,51 +430,51 @@ int FiniteStateMachine::transVerify(int &lastState) {
 //        transVerify(lastState);
         return 0;
     } else {
-        checking.sequence.push_back(trans[currentCheckTrans].getInput());
+        checkingDist.sequence.push_back(trans[currentCheckTrans].getInput());
         tie(outputState, output) = step(lastState, trans[currentCheckTrans].getInput(), false);
-        checking.outputStateSeq.push_back(outputState);
-        checking.outputSequences.push_back(output);
+        checkingDist.outputStateSeq.push_back(outputState);
+        checkingDist.outputSequences.push_back(output);
         lastState = outputState;
     }
 
-    //add one dist to checking sequence
-    checking.addDistToChecking(*this, lastState);
+    //add one dist to checkingDist sequence
+    checkingDist.addDistToChecking(*this, lastState);
 
-    checking.print();
+    checkingDist.print();
 
     //update sequences
-    for (int j = 0; j < checking.sequence.size(); ++j) {
+    for (int j = 0; j < checkingDist.sequence.size(); ++j) {
 
-//        if(checking.sequence[j] == trans[currentCheckTrans].getInput() &&
-//           checking.outputStateSeq[j] == trans[currentCheckTrans].getInputState() &&
-//           checking.outputStateSeq[j+1] == 0) {
+//        if(checkingDist.sequence[j] == trans[currentCheckTrans].getInput() &&
+//           checkingDist.outputStateSeq[j] == trans[currentCheckTrans].getInputState() &&
+//           checkingDist.outputStateSeq[j+1] == 0) {
 //
-//            checking.outputStateSeq[j + 1] = outputState;
+//            checkingDist.outputStateSeq[j + 1] = outputState;
 //        }
         //look checkedTrans and put in to the sequence again
-        if (checking.outputStateSeq[j] != 0 && checking.outputStateSeq[j + 1] == 0) {
-            for (int i = 0; i < checking.isCheckedTrans.size(); ++i) {
+        if (checkingDist.outputStateSeq[j] != 0 && checkingDist.outputStateSeq[j + 1] == 0) {
+            for (int i = 0; i < checkingDist.isCheckedTrans.size(); ++i) {
 
-                if (checking.isCheckedTrans[i] == true &&
-                    checking.sequence[j] == trans[i].getInput() &&
-                    checking.outputStateSeq[j] == trans[i].getInputState()) {
+                if (checkingDist.isCheckedTrans[i] == true &&
+                    checkingDist.sequence[j] == trans[i].getInput() &&
+                    checkingDist.outputStateSeq[j] == trans[i].getInputState()) {
 
-                    checking.outputStateSeq[j + 1] = trans[i].getOutputState();
+                    checkingDist.outputStateSeq[j + 1] = trans[i].getOutputState();
                 }
             }
         }
     }
-    checking.print();
+    checkingDist.print();
 
     //update isCheckedTrans
-    for (int iSeq = 0; iSeq < checking.sequence.size(); ++iSeq) {
-        if (checking.outputStateSeq[iSeq] != 0 && checking.outputStateSeq[iSeq + 1] != 0) {
+    for (int iSeq = 0; iSeq < checkingDist.sequence.size(); ++iSeq) {
+        if (checkingDist.outputStateSeq[iSeq] != 0 && checkingDist.outputStateSeq[iSeq + 1] != 0) {
 
             for (int jTrans = 0; jTrans < trans.size(); ++jTrans) {
-                if (trans[jTrans].getInputState() == checking.outputStateSeq[iSeq] &&
-                    trans[jTrans].getInput() == checking.sequence[iSeq] &&
-                    checking.isCheckedTrans[jTrans] == false) {
-                    checking.isCheckedTrans[jTrans] = true;
+                if (trans[jTrans].getInputState() == checkingDist.outputStateSeq[iSeq] &&
+                    trans[jTrans].getInput() == checkingDist.sequence[iSeq] &&
+                    checkingDist.isCheckedTrans[jTrans] == false) {
+                    checkingDist.isCheckedTrans[jTrans] = true;
                     break;
                 }
             }
@@ -484,7 +484,7 @@ int FiniteStateMachine::transVerify(int &lastState) {
 
 }
 
-void FiniteStateMachine::Checking::addDistToChecking(FiniteStateMachine fsm, int &lastState) {
+void FiniteStateMachine::CheckingDist::addDistToChecking(FiniteStateMachine fsm, int &lastState) {
 
     //add dist seq, output states and outputs to check seq for state A
     for (int i = 0; i < fsm.distinguish.sequence.size(); ++i) {
@@ -543,7 +543,7 @@ void FiniteStateMachine::Distinguish::print() {
 
 }
 
-void FiniteStateMachine::Checking::print() {
+void FiniteStateMachine::CheckingDist::print() {
 
     cout << "--------------------------------------" << endl;
     cout << " ";
@@ -582,7 +582,7 @@ void FiniteStateMachine::Checking::print() {
 
 }
 
-bool FiniteStateMachine::Checking::isAllChecked() {
+bool FiniteStateMachine::CheckingDist::isAllChecked() {
     bool temp = true;
     for (int i = 0; i < isCheckedState.size(); ++i) {
         temp = temp && isCheckedState[i];
@@ -590,7 +590,7 @@ bool FiniteStateMachine::Checking::isAllChecked() {
     return temp;
 }
 
-bool FiniteStateMachine::Checking::isAllTransChecked() {
+bool FiniteStateMachine::CheckingDist::isAllTransChecked() {
     bool temp = true;
     for (int i = 0; i < isCheckedTrans.size(); ++i) {
         temp = temp && isCheckedTrans[i];
@@ -611,7 +611,6 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
     characterizing.currInputSeq.emplace_back("");
 
     characterizing.currUncertainties.push_back(startInputStates);
-
 
     vector<string> preOutSeq;
     vector<string> preInpSeq;
@@ -655,8 +654,6 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 
 
     characterizing.findCharacterizingSequences(stateNumber, print);
-
-    produceLocatingSequences();
 }
 
 int
@@ -730,31 +727,6 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
     return 0;
 }
 
-void FiniteStateMachine::findInOutStatesChar() {
-    for (int inputState = 1; inputState <= stateNumber; ++inputState) {
-
-        int outputState = -1;
-        int output;
-        string tempOutputSeq;
-        string tempOutputStateSeq;
-        int tempInputState = inputState;
-        for (int distInp = 0; distInp < distinguish.sequence.size(); ++distInp) {
-
-            tie(outputState, output) = step(tempInputState, distinguish.sequence[distInp] - '0', false);
-            tempOutputSeq.append(to_string(output));
-            tempOutputStateSeq.append(to_string(outputState));
-            tempInputState = outputState;
-        }
-        characterizing.outputSequences.push_back(tempOutputSeq);
-        characterizing.outputStateSeq.push_back(tempOutputStateSeq);
-        characterizing.initialStates.append(to_string(inputState));
-        characterizing.outputStates.append(to_string(outputState));
-
-    }
-
-}
-
-
 void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, bool print) {
 
     //create table to check is there any char seq
@@ -767,7 +739,7 @@ void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, 
     allOutputSeqTable.push_back(tempOutputSeq);
 
     if(print) {
-        //print table that checking char seq
+        //print table that checkingDist char seq
         cout << allInputSeq.back() << endl;
         cout << "-------" << endl;
         for (int j = 0; j < allOutputSeqTable.back().size(); ++j) {
@@ -841,6 +813,15 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
     sort( sequences.begin(), sequences.end() );
     sequences.erase( unique( sequences.begin(), sequences.end() ), sequences.end() );
 
+    //generate all output seq for char seq
+    for (int n = 0; n < sequences.size(); ++n) {
+        for (int i = 0; i < allInputSeq.size(); ++i) {
+            if(sequences[n] == allInputSeq[i] ){
+               outputSequences.push_back(allOutputSeqTable[i]);
+            }
+        }
+    }
+
     if(print) {
         cout<< "Characterizing Sequences"<<endl;
         for (int m = 0; m < sequences.size(); ++m) {
@@ -850,51 +831,71 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
 
 }
 
-void FiniteStateMachine::produceLocatingSequences() {
 
-    vector<vector<string>> yCharSeqReturnInp;//corresponded to the char seq
+int FiniteStateMachine::generateCheckingSequenceChar() {
 
-    vector<vector<string>> returnInputSeq;
+    generateCharacterizingSequences(false);
 
-    vector<string> tempVecString;
-    vector<string> oneReturnBack;
-    for (int charSeq = 0; charSeq < characterizing.sequences.size(); ++charSeq) {
-        string tempString = characterizing.sequences[charSeq];
+    vector<string> pathForState;
+    vector<string> pathForStateOutputSeq;
 
-        for (int state = 1; state <= stateNumber ; ++state) {
 
-            int outputState = -1;
-            int output;
-            int tempOutput;
-            int tempState = state;
+    string initialState = "1";
 
-            for (int i = 0; i < characterizing.sequences[charSeq].size(); ++i) {
 
-                tie(outputState, output) = step(tempState, characterizing.sequences[charSeq][i] - '0', false);
-                tempState = outputState;
-            }
-            //if last state is not equal initial state, take back to initial state
-            if(tempState != state){
-                for (int i = 1; i < characterizing.allOutputStateSeq.size(); ++i) {
-                    if(state == stoi(characterizing.allOutputStateSeq[i][tempState-1])){
-                        oneReturnBack.push_back(characterizing.allInputSeq[i-1]);
-                        break;                    }
+    //generate seq that reach from state A to desired state
+    for (int state = 1; state <= stateNumber; ++state) {
+        if(state == 1 ){
+            pathForState.push_back("");
+            pathForStateOutputSeq.push_back("");
+        }
+        else{
+            for (int i = 0; i < characterizing.allInputSeq.size(); ++i) {
+                if(state == stoi(characterizing.allOutputStateSeq[i+1][0])) {
+                    pathForState.push_back(characterizing.allInputSeq[i]);
+                    pathForStateOutputSeq.push_back(characterizing.allOutputSeqTable[i][0]);
+                    break;
                 }
             }
-            else{
-                oneReturnBack.push_back("");
-            }
-
-
-            tempVecString.push_back(tempString + oneReturnBack[state-1]);
-
         }
-        yCharSeqReturnInp.push_back(tempVecString);
-        oneReturnBack.clear();
-        tempVecString.clear();
+
     }
 
 
+
+    //check for states
+    for (int state = 1; state <= stateNumber; ++state) {
+        for (int charSeq = 0; charSeq < characterizing.sequences.size() ; ++charSeq) {
+            string oneCheckingSeq;
+            string oneCheckingOutputSeq;
+
+            oneCheckingSeq.append(pathForState[state-1] + characterizing.sequences[charSeq]);
+            oneCheckingOutputSeq.append(pathForStateOutputSeq[state-1] + characterizing.outputSequences[charSeq][state-1]);
+
+            checkingChar.sequences.push_back(oneCheckingSeq);
+            checkingChar.outputSequences.push_back(oneCheckingOutputSeq);
+        }
+    }
+
+    //check for transition
+    for (int j = 0; j < trans.size(); ++j) {
+        for (int charSeq = 0; charSeq < characterizing.sequences.size() ; ++charSeq) {
+
+            string oneCheckingSeq;
+            string oneCheckingOutputSeq;
+            int state = trans[j].getInputState();
+
+            oneCheckingSeq.append(pathForState[state-1] + to_string(trans[j].getInput()) + characterizing.sequences[charSeq]);
+            oneCheckingOutputSeq.append(pathForStateOutputSeq[state-1] + to_string(trans[j].getOutput()) + characterizing.outputSequences[charSeq][trans[j].getOutputState()-1]);
+
+            checkingChar.sequences.push_back(oneCheckingSeq);
+            checkingChar.outputSequences.push_back(oneCheckingOutputSeq);
+        }
+    }
+
+
+
+    return 0;
 }
 
 void FiniteStateMachine::Characterizing::printOutputTable(int stateNumber) {
