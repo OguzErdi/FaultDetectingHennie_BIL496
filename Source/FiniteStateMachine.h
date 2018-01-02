@@ -26,6 +26,9 @@ public:
 
 
 private:
+    int stateNumber;
+    vector<Transition> trans;
+
     class Distinguish{
     public:
         string sequence;
@@ -67,18 +70,19 @@ private:
         vector<string> currOutputSeq;
         vector<string> currInputSeq;
         vector<string> allInputSeq;
+        //first element is unnecessary, use index + 1
+        vector<vector<string>> allOutputStateSeq;
         vector<vector<string>> allOutputSeqTable;
+        vector<string> locatingSequences;
 
         void printOutputTable(int stateNumber);
         //stop when outputSeq size n-1
         void makeCharSeqCheckTable(int stateNumber, bool print);
         void findCharacterizingSequences(int stateNumber, bool print);
-
     };
     Characterizing characterizing;
 
-    int stateNumber;
-    vector<Transition> trans;
+    void produceLocatingSequences();
 
     int produceUncertaintyDist(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);

@@ -612,14 +612,16 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
 
     characterizing.currUncertainties.push_back(startInputStates);
 
+
     vector<string> preOutSeq;
     vector<string> preInpSeq;
 
     for (auto it = characterizing.currUncertainties.begin(); it != characterizing.currUncertainties.end();) {
-        for (int i = 0; i < stateNumber; ++i)
+        for (int i = 0; i < stateNumber; ++i) {
             preOutSeq.emplace_back(characterizing.currOutputSeq[i] + "");
-
+        }
         preInpSeq.emplace_back(characterizing.currInputSeq[0] + "");
+
 
         produceUncertaintyChar(*it, print, preOutSeq, preInpSeq);
 
@@ -651,7 +653,10 @@ void FiniteStateMachine::generateCharacterizingSequences(bool print) {
     if(print)
         characterizing.printOutputTable(stateNumber);
 
+
     characterizing.findCharacterizingSequences(stateNumber, print);
+
+    produceLocatingSequences();
 }
 
 int
@@ -666,6 +671,12 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
         cout << ")";
         cout << endl;
     }
+
+    vector<string> outputStateSeq;
+    for (int i = 0; i < stateNumber; ++i) {
+        outputStateSeq.push_back(to_string(pInputStates[i]));
+    }
+    characterizing.allOutputStateSeq.push_back(outputStateSeq);
 
 
     for (int input = 0; input < 2; input++) {
@@ -695,6 +706,7 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
         }
 
 
+
         if (print) {
             cout << "(" << input << ") - Output State= ";
             cout << "(";
@@ -707,8 +719,9 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
 
         characterizing.currUncertainties.push_back(uncertainty);
         //outputlar tek diziye sokluyor tekrar
-        for (int i = 0; i < stateNumber; ++i)
+        for (int i = 0; i < stateNumber; ++i) {
             characterizing.currOutputSeq.push_back(outputSeqs[i]);
+        }
 
         preInputs.append(precedingInpSeq[0]);
         preInputs.append(to_string(input));
@@ -741,6 +754,7 @@ void FiniteStateMachine::findInOutStatesChar() {
 
 }
 
+
 void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, bool print) {
 
     //create table to check is there any char seq
@@ -749,6 +763,7 @@ void FiniteStateMachine::Characterizing::makeCharSeqCheckTable(int stateNumber, 
     for (int i = 0; i < stateNumber; ++i) {
         tempOutputSeq.push_back(currOutputSeq[i]);
     }
+
     allOutputSeqTable.push_back(tempOutputSeq);
 
     if(print) {
@@ -835,6 +850,53 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
 
 }
 
+void FiniteStateMachine::produceLocatingSequences() {
+
+    vector<vector<string>> yCharSeqReturnInp;//corresponded to the char seq
+
+    vector<vector<string>> returnInputSeq;
+
+    vector<string> tempVecString;
+    vector<string> oneReturnBack;
+    for (int charSeq = 0; charSeq < characterizing.sequences.size(); ++charSeq) {
+        string tempString = characterizing.sequences[charSeq];
+
+        for (int state = 1; state <= stateNumber ; ++state) {
+
+            int outputState = -1;
+            int output;
+            int tempOutput;
+            int tempState = state;
+
+            for (int i = 0; i < characterizing.sequences[charSeq].size(); ++i) {
+
+                tie(outputState, output) = step(tempState, characterizing.sequences[charSeq][i] - '0', false);
+                tempState = outputState;
+            }
+            //if last state is not equal initial state, take back to initial state
+            if(tempState != state){
+                for (int i = 1; i < characterizing.allOutputStateSeq.size(); ++i) {
+                    if(state == stoi(characterizing.allOutputStateSeq[i][tempState-1])){
+                        oneReturnBack.push_back(characterizing.allInputSeq[i-1]);
+                        break;                    }
+                }
+            }
+            else{
+                oneReturnBack.push_back("");
+            }
+
+
+            tempVecString.push_back(tempString + oneReturnBack[state-1]);
+
+        }
+        yCharSeqReturnInp.push_back(tempVecString);
+        oneReturnBack.clear();
+        tempVecString.clear();
+    }
+
+
+}
+
 void FiniteStateMachine::Characterizing::printOutputTable(int stateNumber) {
 
     cout<<"Output table"<<endl;
@@ -849,6 +911,32 @@ void FiniteStateMachine::Characterizing::printOutputTable(int stateNumber) {
     for (int i = 0; i < stateNumber; ++i) {
         for (int m = 0; m < allOutputSeqTable.size(); ++m) {
             cout <<allOutputSeqTable[m][i]+"\t";
+        }
+        cout<<endl;
+    }
+    cout << "" << endl;
+    for (int i = 0; i < stateNumber; ++i) {
+        for (int m = 1; m < allOutputStateSeq.size(); ++m) {
+//            cout <<allOutputStateSeq[m][i]+"\t";
+
+            switch (stoi(allOutputStateSeq[m][i])) {
+                case 0:
+                    cout << "  ";
+                    break;
+                case 1:
+                    cout << "A ";
+                    break;
+                case 2:
+                    cout << "B ";
+                    break;
+                case 3:
+                    cout << "C ";
+                    break;
+                case 4:
+                    cout << "D ";
+                    break;
+            }
+            cout<<"\t";
         }
         cout<<endl;
     }
