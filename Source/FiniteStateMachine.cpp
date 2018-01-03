@@ -140,7 +140,7 @@ int FiniteStateMachine::produceUncertaintyDist(vector<vector<int>> pInputStates,
     }
 
 
-    for (int input = 0; input < 2; input++) {
+    for (int input = 0; input < 3; input++) {
 
 
         string outputsFlags[stateNumber];
@@ -367,7 +367,7 @@ vector<int> FiniteStateMachine::findUncheckedItem(vector<vector<int>> &inputs, v
     tempOutputStates.erase(tempOutputStates.begin());
     vector<int> initialTempInp = inputs[0];
     inputs.erase(inputs.begin());
-    for (int input = 0; input < 2; input++) {
+    for (int input = 0; input < 3; input++) {
         vector<int> oneSideInputs = initialTempInp;
         tie(outputState, output) = step(tempInpState, input, false);
         oneSideInputs.push_back(input);
@@ -498,7 +498,7 @@ void FiniteStateMachine::CheckingDist::addDistToChecking(FiniteStateMachine fsm,
     }
     //add output states
     for (int j = 0; j < fsm.distinguish.outputStateSeq[lastState - 1].size(); ++j) {
-        if (j == fsm.distinguish.outputStateSeq[lastState - 1].size() - 1) //not the end one
+        if (j == fsm.distinguish.outputStateSeq[lastState - 1].size() - 1) //if the last value of outputs
             //add output states
             outputStateSeq.push_back(fsm.distinguish.outputStateSeq[lastState - 1][j] - '0');
         else
@@ -680,7 +680,7 @@ FiniteStateMachine::produceUncertaintyChar(vector<int> pInputStates, bool print,
     characterizing.allOutputStateSeq.push_back(outputStateSeq);
 
 
-    for (int input = 0; input < 2; input++) {
+    for (int input = 0; input < 3; input++) {
         vector<int> uncertainty;
 
         //outputların, outputStateler ile aynı hizada olması icin aynı yapıda store edilmeli
