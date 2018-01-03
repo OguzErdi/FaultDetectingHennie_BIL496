@@ -26,6 +26,7 @@ FsmHelper::FsmHelper()
     else
         cout << "Fsm.txt file doesnt open\n";
 
+
 }
 FsmHelper::FsmHelper(string file)
 {
@@ -38,7 +39,7 @@ FsmHelper::FsmHelper(string file)
 
 bool FsmHelper::GetOneFsm()
 {
-    char tempC;
+    char tempC, inputSignal;
     int tempInt;
     int transNo;
 
@@ -48,16 +49,38 @@ bool FsmHelper::GetOneFsm()
     dataFsmFile >> tempC;
     dataFsmFile >> tempC;
     dataFsmFile >> tempInt;
+    dataFsmFile >> tempInt;
     inputs.push_back(tempInt);
     dataFsmFile >> transNo;
     inputs.push_back(transNo);
 
     int transValues = transNo * 4;
 
-    for (int i = 0; i < transValues; ++i) {
+    for (int i = 0; i < transNo; ++i) {
+        dataFsmFile >> tempInt;
+        inputs.push_back(tempInt);
+        dataFsmFile >> tempInt;
+        inputs.push_back(tempInt);
+        dataFsmFile >> inputSignal;
+
+        //return the input signal from alphabet to number
+        if(inputSignal == 'a')
+            tempInt= 0;
+        else if(inputSignal == 'b')
+            tempInt= 1;
+        else if(inputSignal == 'c')
+            tempInt= 2;
+        else if(inputSignal == 'd')
+            tempInt= 3;
+        else if(inputSignal == 'e')
+            tempInt= 4;
+
+        inputs.push_back(tempInt);
+
         dataFsmFile >> tempInt;
         inputs.push_back(tempInt);
     }
+
 
     return true;
 
@@ -66,6 +89,12 @@ bool FsmHelper::GetOneFsm()
 vector <FiniteStateMachine> FsmHelper::GetAllFsms() {
 
     FsmHelper fsm;
+    list<int> idle(0);
+
+    //add one idle fsm for make index and FSM number equal
+    idle.push_back(0);
+    FiniteStateMachine idleFSM(idle);
+    fsmList.push_back(idleFSM);
 
     while(GetOneFsm()) {
         FiniteStateMachine tempFSM(inputs);

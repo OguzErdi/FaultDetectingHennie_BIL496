@@ -3,26 +3,26 @@
 FiniteStateMachine::FiniteStateMachine(list<int> inputs) {
 
     auto it = inputs.begin();//iterator for traverse inputs
+    if(*it != 0) {//if it is not idle
 
-
-    stateNumber = *it;
-    it++;
-    it++;
-
-    for (; it != inputs.end(); it++) {
-        int tempInpState = *it;
+        stateNumber = *it;
         it++;
-        int tempOutState = *it;
         it++;
-        int tempInput = *it;
-        it++;
-        int tempOutput = *it;
 
-        Transition tempTrans(tempInpState, tempOutState, tempInput, tempOutput);
+        for (; it != inputs.end(); it++) {
+            int tempInpState = *it;
+            it++;
+            int tempOutState = *it;
+            it++;
+            int tempInput = *it;
+            it++;
+            int tempOutput = *it;
 
-        trans.push_back(tempTrans);
+            Transition tempTrans(tempInpState, tempOutState, tempInput, tempOutput);
+
+            trans.push_back(tempTrans);
+        }
     }
-
 }
 
 const vector<Transition> &FiniteStateMachine::getTrans() const {
@@ -321,9 +321,13 @@ int FiniteStateMachine::generateCheckingSequenceDist() {
 
 
 
-//    for (int i = 0; i < isCheckedTrans.size(); ++i) {
-//        checkingDist
-//    }
+    for (int i = 0; i < checkingDist.sequence.size(); ++i) {
+        cout << checkingDist.sequence[i];
+    }
+    cout<<endl;
+    for (int i = 0; i < checkingDist.sequence.size(); ++i) {
+        cout << checkingDist.outputSequences[i];
+    }
 
 
     return 0;
@@ -824,11 +828,12 @@ void FiniteStateMachine::Characterizing::findCharacterizingSequences(int stateNu
 
     if(print) {
         cout<< "Characterizing Sequences"<<endl;
-        for (int m = 0; m < sequences.size(); ++m) {
-            cout << sequences[m] << endl;
-        }
     }
 
+    for (int m = 0; m < sequences.size(); ++m) {
+        cout << sequences[m] << endl;
+    }
+    cout<< endl;
 }
 
 
@@ -891,6 +896,11 @@ int FiniteStateMachine::generateCheckingSequenceChar() {
             checkingChar.sequences.push_back(oneCheckingSeq);
             checkingChar.outputSequences.push_back(oneCheckingOutputSeq);
         }
+    }
+
+    for (int k = 0; k < checkingChar.sequences.size(); ++k) {
+        cout<< checkingChar.sequences[k]<<endl;
+        cout<< checkingChar.outputSequences[k]<<endl;
     }
 
 

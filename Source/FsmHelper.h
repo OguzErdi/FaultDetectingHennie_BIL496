@@ -23,6 +23,7 @@ static vector<FiniteStateMachine> fsmList;
 static list<int> inputs;
 static ifstream dataFsmFile;
 
+
 ostream &operator<<(ostream &output, const Transition &transition );
 
 ostream &operator<<(ostream &output, const FiniteStateMachine &fsm);
