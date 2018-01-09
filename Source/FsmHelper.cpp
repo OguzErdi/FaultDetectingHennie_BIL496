@@ -190,17 +190,65 @@ void FsmHelper::makeCheck(int no) {
         cout<<"FSM "<<i<< endl;
         fsmList[i].generateCheckingSequence();
 
-        for (int j = 0; j < fsmList[i].getTrans().size(); ++j) {
-                if((fsmList[i].getTrans()[j].getOutput() != fsmTestList[i].getTrans()[j].getOutput()) ||
-                        (fsmList[i].getTrans()[j].getOutputState() != fsmTestList[i].getTrans()[j].getOutputState() )  ) {
+        string checkingSequence;
+        string checkingOutputSequences;
+
+        if(!fsmList[i].checkingDist.sequence.empty()) {
+            for (int j = 0; j < fsmList[i].checkingDist.sequence.size(); ++j) {
+                checkingSequence.append(to_string(fsmList[i].checkingDist.sequence[j]));
+            }
+            for (int j = 0; j < fsmList[i].checkingDist.outputSequences.size(); ++j) {
+                checkingOutputSequences.append(to_string(fsmList[i].checkingDist.outputSequences[j]));
+            }
+
+
+            string testOutputSeq;
+            int inputState=1;
+            FiniteStateMachine test = fsmTestList[i];
+            for (int i = 0; i < checkingSequence.size(); ++i) {
+
+                int output;
+                int outputState;
+                tie(outputState, output) = test.step(inputState, checkingSequence[i] - '0', false);
+
+                testOutputSeq.append(to_string(output));
+                inputState = outputState;
+            }
+
+            if(checkingOutputSequences != testOutputSeq ){
+                flag = true;
+            }
+        }
+        else{
+            for (int j = 0; j < fsmList[i].checkingChar.sequences.size(); ++j) {
+                checkingSequence = fsmList[i].checkingChar.sequences[j];
+                checkingOutputSequences = fsmList[i].checkingChar.outputSequences[j];
+
+                string testOutputSeq;
+                int inputState=1;
+                FiniteStateMachine test = fsmTestList[i];
+                for (int i = 0; i < checkingSequence.size(); ++i) {
+
+                    int output;
+                    int outputState;
+                    tie(outputState, output) = test.step(inputState, checkingSequence[i] - '0', false);
+
+                    testOutputSeq.append(to_string(output));
+                    inputState = outputState;
+                }
+
+                if(checkingOutputSequences != testOutputSeq ){
                     flag = true;
                     break;
                 }
+            }
         }
+
         if(flag)
         {
             mutants.push_back(fsmList[i].fsmNo);
-        flag = false;}
+            flag = false;
+        }
     }
 
 
