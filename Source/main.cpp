@@ -9,6 +9,12 @@ int main(int argc, char* argv[])
     vector<FiniteStateMachine> fsmList;
     fsmList = FsmHelper::GetAllFsms();
 
-    fsmList[1].generateCheckingSequenceDist();
+    vector<FiniteStateMachine> fsmTestList;
+    fsmTestList = FsmHelper::GetAllTestFsms();
+
+
+
+    FsmHelper::makeCheck(10000);
+
 
 }

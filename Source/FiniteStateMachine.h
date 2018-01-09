@@ -20,30 +20,20 @@ public:
     tuple<int, int> step(int inpState,
                          int input,
                          bool print);
+    int generateCheckingSequence();
     void generateDistinguishSequence(bool print);
+    void generateCharacterizingSequences(bool print);
     int generateCheckingSequenceDist();
     int generateCheckingSequenceChar();
-    void generateCharacterizingSequences(bool print);
+    int inputNo;
+    int fsmNo;
 
-
-private:
-    int stateNumber;
-    vector<Transition> trans;
-
-    class Distinguish{
+    class CheckingChar{
     public:
-        string sequence;
+        vector<string> sequences;
         vector<string> outputSequences;
-        vector<string> outputStateSeq;
-        string initialStates;
-        string outputStates;
-        vector<vector<vector<int>>> currUncertainties;
-        vector<string> currOutputSeq;
-        vector<string> currInputSeq;
-        void print();
-
     };
-    Distinguish distinguish;
+    CheckingChar checkingChar;
 
     class CheckingDist{
     public:
@@ -60,6 +50,26 @@ private:
     };
     CheckingDist checkingDist;
 
+
+private:
+    int stateNumber;
+    vector<Transition> trans;
+
+    class Distinguish{
+    public:
+        string sequence;
+        vector<string> outputSequences;
+        vector<vector<int>> outputStateSeq;
+        string initialStates;
+        string outputStates;
+        vector<vector<vector<int>>> currUncertainties;
+        vector<string> currOutputSeq;
+        vector<string> currInputSeq;
+        void print();
+
+    };
+    Distinguish distinguish;
+
     class Characterizing{
     public:
         vector<string> sequences;
@@ -69,7 +79,7 @@ private:
         vector<string> currInputSeq;
         vector<string> allInputSeq;
         //first element is unnecessary, use index + 1
-        vector<vector<string>> allOutputStateSeq;
+        vector<vector<int>> allOutputStateSeq;
         vector<vector<string>> allOutputSeqTable;
 
         void printOutputTable(int stateNumber);
@@ -79,12 +89,7 @@ private:
     };
     Characterizing characterizing;
 
-    class CheckingChar{
-    public:
-        vector<string> sequences;
-        vector<string> outputSequences;
-    };
-    CheckingChar checkingChar;
+
 
     int produceUncertaintyDist(vector<vector<int>> pInputStates, bool print, vector<string> precedingOutSeq,
                                vector<string> precedingInpSeq);
@@ -95,7 +100,7 @@ private:
 
     vector<int> findUncheckedItem(vector<vector<int>> &inputs, vector<int> &tempOutputStates, string item);
 
-    void takeToUncheckedItem(int &lastState, string item);
+    int takeToUncheckedItem(int &lastState, string item);
 
     int transVerify(int &lastState);
 

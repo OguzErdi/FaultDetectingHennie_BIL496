@@ -22,10 +22,17 @@ FsmHelper::FsmHelper()
 {
     dataFsmFile.open("../FsmData/fsm.txt");
     if(dataFsmFile.is_open())
-        cout << "Fsm.txt file is opened\n";
+        cout << "fsm.txt file is opened\n";
     else
-        cout << "Fsm.txt file doesnt open\n";
+        cout << "fsm.txt file doesn't open\n";
 
+
+
+    dataTestFsmFile.open("../FsmData/fsm_test.txt");
+    if(dataTestFsmFile.is_open())
+        cout << "fsm_test.txt file is opened\n";
+    else
+        cout << "fsm_test.txt file doesn't open\n";
 
 }
 FsmHelper::FsmHelper(string file)
@@ -49,6 +56,7 @@ bool FsmHelper::GetOneFsm()
     dataFsmFile >> tempC;
     dataFsmFile >> tempC;
     dataFsmFile >> tempInt;
+    inputs.push_back(tempInt);
     dataFsmFile >> tempInt;
     inputs.push_back(tempInt);
     dataFsmFile >> transNo;
@@ -104,6 +112,101 @@ vector <FiniteStateMachine> FsmHelper::GetAllFsms() {
 
     dataFsmFile.close();
     return fsmList;
+}
+bool FsmHelper::GetOneTestFsm()
+{
+    char tempC, inputSignal;
+    int tempInt;
+    int transNo;
+
+    dataTestFsmFile >> tempC;
+    if(dataTestFsmFile.eof())
+        return false;
+    dataTestFsmFile >> tempC;
+    dataTestFsmFile >> tempC;
+    dataTestFsmFile >> tempInt;
+    inputsTest.push_back(tempInt);
+    dataTestFsmFile >> tempInt;
+    inputsTest.push_back(tempInt);
+    dataTestFsmFile >> transNo;
+    inputsTest.push_back(transNo);
+
+    int transValues = transNo * 4;
+
+    for (int i = 0; i < transNo; ++i) {
+        dataTestFsmFile >> tempInt;
+        inputsTest.push_back(tempInt);
+        dataTestFsmFile >> tempInt;
+        inputsTest.push_back(tempInt);
+        dataTestFsmFile >> inputSignal;
+
+        //return the input signal from alphabet to number
+        if(inputSignal == 'a')
+            tempInt= 0;
+        else if(inputSignal == 'b')
+            tempInt= 1;
+        else if(inputSignal == 'c')
+            tempInt= 2;
+        else if(inputSignal == 'd')
+            tempInt= 3;
+        else if(inputSignal == 'e')
+            tempInt= 4;
+
+        inputsTest.push_back(tempInt);
+
+        dataTestFsmFile >> tempInt;
+        inputsTest.push_back(tempInt);
+    }
+
+
+    return true;
+
+}
+
+vector <FiniteStateMachine> FsmHelper::GetAllTestFsms() {
+
+    list<int> idle(0);
+
+    //add one idle fsm for make index and FSM number equal
+    idle.push_back(0);
+    FiniteStateMachine idleFSM(idle);
+    fsmTestList.push_back(idleFSM);
+
+    while(GetOneTestFsm()) {
+        FiniteStateMachine tempFSM(inputsTest);
+        fsmTestList.push_back(tempFSM);
+        inputsTest.clear();
+    }
+
+    dataTestFsmFile.close();
+    return fsmTestList;
+}
+
+void FsmHelper::makeCheck(int no) {
+
+    bool flag=false;
+    for (int i = 1; i <= no; ++i) {
+
+        cout<<"FSM "<<i<< endl;
+        fsmList[i].generateCheckingSequence();
+
+        for (int j = 0; j < fsmList[i].getTrans().size(); ++j) {
+                if((fsmList[i].getTrans()[j].getOutput() != fsmTestList[i].getTrans()[j].getOutput()) ||
+                        (fsmList[i].getTrans()[j].getOutputState() != fsmTestList[i].getTrans()[j].getOutputState() )  ) {
+                    flag = true;
+                    break;
+                }
+        }
+        if(flag)
+        {
+            mutants.push_back(fsmList[i].fsmNo);
+        flag = false;}
+    }
+
+
+    for (int k = 0; k < mutants.size(); ++k) {
+        cout<<mutants[k]<<endl;
+    }
 }
 
 
